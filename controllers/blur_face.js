@@ -23,6 +23,7 @@ const uploadFile = async (bucket, key, filePath) => {
 };
 
 const processVideo = async (videoStream, facesData, outputPath) => {
+    console.log('processVideo started')
     return new Promise((resolve, reject) => {
         // Create temporary files for input and output
         tmp.file({ postfix: '.mp4' }, (err, tempInputPath, tempInputFd, cleanupCallback) => {
@@ -73,12 +74,12 @@ const processVideo = async (videoStream, facesData, outputPath) => {
 exports.handler = async (event) => {
     try {
         const bucket = 'project-videostore';  // Replace with your bucket name
-        const inputKey = 'potrait_sample.mp4 ';  // Replace with your input video key
-        const outputKey = 'new_potrait_sample.mp4 ';  // Replace with your output video key
+        const inputKey = 'potrait_sample.mp4';  // Replace with your input video key
+        const outputKey = 'new_potrait_sample.mp4';  // Replace with your output video key
 
         // Download the video from S3
         console.log('Video download start')
-        const videoStream = await downloadFile(bucket, inputKey);
+        const videoStream = (await downloadFile(bucket, inputKey));
         console.log('Video download end => ', videoStream)
 
         // Fetch face detection results
