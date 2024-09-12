@@ -1,4 +1,3 @@
-const AWS = require('aws-sdk');
 const ffmpegPath = require('@ffmpeg-installer/ffmpeg').path;
 const ffprobePath = require('@ffprobe-installer/ffprobe').path;
 const ffmpeg = require('fluent-ffmpeg');
@@ -8,9 +7,10 @@ const { PassThrough } = require('stream');
 const tmp = require('tmp');
 const fs = require('fs');
 const util = require('util');
-
-const s3 = new AWS.S3();
-const rekognition = new AWS.Rekognition();
+const S3AWS = require('@aws-sdk/client-s3')
+const rekognitionAWS = require('@aws-sdk/client-rekognition');
+const s3 = new S3AWS.S3()
+const rekognition = new rekognitionAWS.Rekognition();
 
 const downloadFile = async (bucket, key) => {
     const pass = new PassThrough();
