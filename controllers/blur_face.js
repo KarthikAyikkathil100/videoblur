@@ -6,7 +6,7 @@ const fs = require('fs');
 const util = require('util');
 
 const s3 = new AWS.S3();
-const rekognition = new AWS.Rekognition();
+const rekognition = new AWS.Rekognition({ region: 'us-east-1' });
 
 const downloadFile = async (bucket, key) => {
     const pass = new PassThrough();
@@ -77,11 +77,14 @@ exports.handler = async (event) => {
         const outputKey = 'new_potrait_sample.mp4 ';  // Replace with your output video key
 
         // Download the video from S3
+        console.log('Video download start')
         const videoStream = await downloadFile(bucket, inputKey);
+        console.log('Video download end')
 
         // Fetch face detection results
         const jobId = '5e69dd3ba11ff88022dc19ed6f925bec2214bca26d529487765ab9c763acd9bb'
         const response = await rekognition.getFaceDetection({ JobId: jobId }).promise();
+        console.log('response => ', response);
         const facesData = response.Faces;
 
         // Process the video
