@@ -29,3 +29,17 @@ functions:
           path: '/admin/start-detection'
           method: 'get'
           cors: true
+  GetFaceDetectionResultsFunction:
+    name: ${self:custom.STAGE}-Admin-GetFaceDetectionResultsFunction
+    runtime: nodejs18.x
+    handler: './controllers/get_face_detection_results.handler'
+    role: 'arn:aws:iam::021891572638:role/masterrole'
+    package:
+      patterns:
+        - 'controllers/get_face_detection_results.js'
+        - 'package.json'
+    events:
+      - http:
+          path: '/admin/get-job-data'
+          method: 'get'
+          cors: true
