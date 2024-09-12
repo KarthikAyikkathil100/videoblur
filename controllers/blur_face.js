@@ -12,13 +12,11 @@ const rekognitionAWS = require('@aws-sdk/client-rekognition');
 const s3 = new S3AWS.S3()
 const rekognition = new rekognitionAWS.Rekognition();
 
+
 const downloadFile = async (bucket, key) => {
-    const pass = new PassThrough();
-    await s3
-        .getObject({ Bucket: bucket, Key: key })
-        .createReadStream()
-        .pipe(pass);
-    return pass;
+    // const pass = new PassThrough();
+    const response = await s3.getObject({ Bucket: bucket, Key: key });
+    return response.Body.pipe(res);
 };
 
 const uploadFile = async (bucket, key, filePath) => {
