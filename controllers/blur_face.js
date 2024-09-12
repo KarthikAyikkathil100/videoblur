@@ -7,17 +7,20 @@ const { PassThrough } = require('stream');
 const tmp = require('tmp');
 const fs = require('fs');
 const util = require('util');
-const S3AWS = require('@aws-sdk/client-s3')
 const rekognitionAWS = require('@aws-sdk/client-rekognition');
-const s3 = new S3AWS.S3()
+const {GetObjectCommand, S3} = require('@aws-sdk/client-s3')
+const s3 = new S3();
 const rekognition = new rekognitionAWS.Rekognition();
 
 
 const downloadFile = async (bucket, key) => {
-    // const pass = new PassThrough();
-    const response = await s3.getObject({ Bucket: bucket, Key: key });
+    const pass = new PassThrough();
+    const command = new GetObjectCommand({ Bucket: bucket, Key: key })
+    const response = await s3.send(command)
     console.log('response => ', response)
-    return response.Body.pipe(response);
+    const contentBuffer = Readable.from(response.Body);
+    contentBuffer.pipe(pass);
+    return pass;
 };
 
 const uploadFile = async (bucket, key, filePath) => {
