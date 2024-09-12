@@ -20,9 +20,7 @@ exports.handler = async (event) => {
                 }
             },
             JobTag: 'FaceDetectionJob',
-            FaceDetection: {
-                FaceAttributes: 'ALL'
-            }
+            FaceAttributes: 'ALL'
         };
 
         // Start the Rekognition video analysis job
