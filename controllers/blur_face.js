@@ -43,7 +43,7 @@ const processVideo = async (videoStream, facesData, outputPath) => {
                     // Add each face as a filter
                     facesData.forEach(face => {
                         console.log('face => ', face)
-                        const { BoundingBox } = face;
+                        const { BoundingBox } = face.face;
                         const { Width, Height, Left, Top } = BoundingBox;
                         const x = Math.round(Left * 100);
                         const y = Math.round(Top * 100);
