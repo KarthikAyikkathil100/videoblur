@@ -108,7 +108,7 @@ const processVideoV2 = async (videoStream, facesData, outputPath) => {
                     console.log('Here ---- => ', filters)
 
                     // Apply all filters at once
-                    const signleFilter = 'boxblur=10:1:0:0:56:9:16:16';
+                    const signleFilter = '\'boxblur=10:1:0:0:56:9:16:16\'';
                     ffmpegCommand.videoFilters(signleFilter);
 
                     ffmpegCommand
