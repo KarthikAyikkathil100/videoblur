@@ -1,18 +1,19 @@
 const AWS = require('aws-sdk');
-const cv = require('opencv4nodejs');
+const ffmpeg = require('fluent-ffmpeg');
 const { PassThrough } = require('stream');
-const s3 = new AWS.S3();
-const rekognition = new AWS.Rekognition();
 const tmp = require('tmp');
 const fs = require('fs');
 const util = require('util');
+
+const s3 = new AWS.S3();
+const rekognition = new AWS.Rekognition();
 
 const downloadFile = async (bucket, key) => {
     const pass = new PassThrough();
     await s3
         .getObject({ Bucket: bucket, Key: key })
         .createReadStream()
-        .pipe(pass)
+        .pipe(pass);
     return pass;
 };
 
@@ -21,37 +22,50 @@ const uploadFile = async (bucket, key, filePath) => {
     await s3.upload({ Bucket: bucket, Key: key, Body: fileStream }).promise();
 };
 
-const blurFaces = async (videoStream, facesData, outputPath) => {
+const processVideo = async (videoStream, facesData, outputPath) => {
     return new Promise((resolve, reject) => {
-        tmp.file({ postfix: '.mp4' }, (err, tempFilePath, fd, cleanupCallback) => {
+        // Create temporary files for input and output
+        tmp.file({ postfix: '.mp4' }, (err, tempInputPath, tempInputFd, cleanupCallback) => {
             if (err) return reject(err);
 
-            const videoWriter = new cv.VideoWriter(tempFilePath, cv.VideoWriter.fourcc('mp4v'), 30, new cv.Size(640, 480));
+            tmp.file({ postfix: '.mp4' }, (err, tempOutputPath, tempOutputFd, cleanupCallback) => {
+                if (err) return reject(err);
 
-            const inputVideo = cv.VideoCapture(videoStream);
-            let frame;
+                // Save the video stream to a temporary file
+                const writeStream = fs.createWriteStream(tempInputPath);
+                videoStream.pipe(writeStream);
 
-            while (inputVideo.read(frame)) {
-                facesData.forEach(face => {
-                    const { BoundingBox } = face;
-                    const { Width, Height, Left, Top } = BoundingBox;
-                    const x = Math.round(Left * frame.cols);
-                    const y = Math.round(Top * frame.rows);
-                    const w = Math.round(Width * frame.cols);
-                    const h = Math.round(Height * frame.rows);
-                    const faceRegion = frame.getRegion(new cv.Rect(x, y, w, h));
-                    const blurredFace = faceRegion.gaussianBlur(new cv.Size(99, 99));
-                    frame.setRegion(new cv.Rect(x, y, w, h), blurredFace);
+                writeStream.on('finish', () => {
+                    // FFmpeg command to blur faces
+                    const ffmpegCommand = ffmpeg(tempInputPath);
+
+                    // Add each face as a filter
+                    facesData.forEach(face => {
+                        const { BoundingBox } = face;
+                        const { Width, Height, Left, Top } = BoundingBox;
+                        const x = Math.round(Left * 100);
+                        const y = Math.round(Top * 100);
+                        const w = Math.round(Width * 100);
+                        const h = Math.round(Height * 100);
+                        ffmpegCommand.videoFilters({
+                            filter: 'boxblur',
+                            options: `10:1:0:0:${x}:${y}:${w}:${h}`
+                        });
+                    });
+
+                    ffmpegCommand
+                        .output(tempOutputPath)
+                        .on('end', () => {
+                            // Clean up and resolve
+                            cleanupCallback();
+                            resolve(tempOutputPath);
+                        })
+                        .on('error', (err) => {
+                            reject(err);
+                        })
+                        .run();
                 });
-
-                videoWriter.write(frame);
-            }
-
-            videoWriter.release();
-
-            // Clean up and resolve
-            cleanupCallback();
-            resolve(tempFilePath);
+            });
         });
     });
 };
@@ -59,8 +73,8 @@ const blurFaces = async (videoStream, facesData, outputPath) => {
 exports.handler = async (event) => {
     try {
         const bucket = 'project-videostore';  // Replace with your bucket name
-        const inputKey = 'potrait_sample.mp4';  // Replace with your input video key
-        const outputKey = 'new_potrait_sample.mp4';  // Replace with your output video key
+        const inputKey = 'potrait_sample.mp4 ';  // Replace with your input video key
+        const outputKey = 'new_potrait_sample.mp4 ';  // Replace with your output video key
 
         // Download the video from S3
         const videoStream = await downloadFile(bucket, inputKey);
@@ -71,7 +85,7 @@ exports.handler = async (event) => {
         const facesData = response.Faces;
 
         // Process the video
-        const tempOutputPath = await blurFaces(videoStream, facesData);
+        const tempOutputPath = await processVideo(videoStream, facesData);
 
         // Upload the processed video to S3
         await uploadFile(bucket, outputKey, tempOutputPath);
