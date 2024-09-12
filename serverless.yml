@@ -1,4 +1,4 @@
-service: Routeme
+service: Videoblur
 frameworkVersion: '3'
 
 provider:
@@ -14,23 +14,6 @@ custom:
   STAGE: ${self:provider.stage}
   APPLICATION: 'videoblur'
 
-resources:
-  Resources:
-    functions:
-      FacedetectionStartFunction:
-        name: ${self:custom.STAGE}-Admin-FacedetectionStartFunction
-        runtime: nodejs18.x
-        handler: './controllers/start_detection.handler'
-        role: 'arn:aws:iam::021891572638:role/masterrole'
-        package:
-          patterns:
-            - 'controllers/start_detection.js'
-            - 'package.json'
-        events:
-          - http:
-              path: '/admin/start-detection'
-              method: 'get'
-              cors: true
 functions:
   FacedetectionStartFunction:
     name: ${self:custom.STAGE}-Admin-FacedetectionStartFunction
