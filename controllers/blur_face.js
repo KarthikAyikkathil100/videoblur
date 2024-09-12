@@ -16,7 +16,8 @@ const rekognition = new rekognitionAWS.Rekognition();
 const downloadFile = async (bucket, key) => {
     // const pass = new PassThrough();
     const response = await s3.getObject({ Bucket: bucket, Key: key });
-    return response.Body.pipe(res);
+    console.log('response => ', response)
+    return response.Body.pipe(response);
 };
 
 const uploadFile = async (bucket, key, filePath) => {
