@@ -24,3 +24,4 @@ resources:
             path: '/admin/start-detection'
             method: 'get'
             cors: true
+            
