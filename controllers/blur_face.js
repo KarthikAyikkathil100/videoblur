@@ -1,7 +1,9 @@
 const AWS = require('aws-sdk');
 const ffmpegPath = require('@ffmpeg-installer/ffmpeg').path;
+const ffprobePath = require('@ffprobe-installer/ffprobe').path;
 const ffmpeg = require('fluent-ffmpeg');
 ffmpeg.setFfmpegPath(ffmpegPath);
+ffmpeg.setFfprobePath(ffprobePath)
 const { PassThrough } = require('stream');
 const tmp = require('tmp');
 const fs = require('fs');
