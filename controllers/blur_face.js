@@ -74,6 +74,68 @@ const processVideo = async (videoStream, facesData, outputPath) => {
     });
 };
 
+const processVideoV2 = async (videoStream, facesData, outputPath) => {
+    console.log('processVideo started');
+    
+    return new Promise((resolve, reject) => {
+        tmp.file({ postfix: '.mp4' }, (err, tempInputPath, tempInputFd, tempInputCleanupCallback) => {
+            if (err) return reject(err);
+
+            tmp.file({ postfix: '.mp4' }, (err, tempOutputPath, tempOutputFd, tempOutputCleanupCallback) => {
+                if (err) {
+                    tempInputCleanupCallback();
+                    return reject(err);
+                }
+
+                // Save the video stream to a temporary file
+                const writeStream = fs.createWriteStream(tempInputPath);
+                videoStream.pipe(writeStream);
+
+                writeStream.on('finish', () => {
+                    // FFmpeg command to blur faces
+                    let ffmpegCommand = ffmpeg(tempInputPath);
+
+                    // Accumulate filters
+                    const filters = facesData.map(face => {
+                        const { BoundingBox } = face.Face;
+                        const { Width, Height, Left, Top } = BoundingBox;
+                        const x = Math.round(Left * 100);
+                        const y = Math.round(Top * 100);
+                        const w = Math.round(Width * 100);
+                        const h = Math.round(Height * 100);
+                        return `boxblur=10:1:0:0:${x}:${y}:${w}:${h}`;
+                    });
+                    console.log('Here ---- => ', filters)
+
+                    // Apply all filters at once
+                    ffmpegCommand.videoFilters(filters.join(','));
+
+                    ffmpegCommand
+                        .output(tempOutputPath)
+                        .on('end', () => {
+                            // Clean up temporary files
+                            tempInputCleanupCallback();
+                            tempOutputCleanupCallback();
+                            resolve(tempOutputPath);
+                        })
+                        .on('error', (err) => {
+                            // Clean up temporary files on error
+                            tempInputCleanupCallback();
+                            tempOutputCleanupCallback();
+                            reject(err);
+                        })
+                        .run();
+                });
+
+                writeStream.on('error', (err) => {
+                    tempInputCleanupCallback();
+                    reject(err);
+                });
+            });
+        });
+    });
+};
+
 exports.handler = async (event) => {
     try {
         const bucket = 'project-videostore';  // Replace with your bucket name
@@ -92,7 +154,7 @@ exports.handler = async (event) => {
         const facesData = response.Faces;
 
         // Process the video
-        const tempOutputPath = await processVideo(videoStream, facesData);
+        const tempOutputPath = await processVideoV2(videoStream, facesData);
 
         // Upload the processed video to S3
         await uploadFile(bucket, outputKey, tempOutputPath);
