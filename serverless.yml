@@ -8,6 +8,12 @@ provider:
   stage: ${opt:stage}
   versionFunctions: false
 
+custom:
+  ACCOUNT_ID: !Ref AWS::AccountId
+  REGION: !Ref AWS::Region
+  STAGE: ${self:provider.stage}
+  APPLICATION: 'videoblur'
+
 resources:
   Resources:
     FacedetectionStartFunction:
@@ -24,4 +30,3 @@ resources:
             path: '/admin/start-detection'
             method: 'get'
             cors: true
-            
