@@ -9,7 +9,7 @@ exports.handler = async (event) => {
     try {
         // Extract S3 bucket and video key from the event
         const bucket = 'project-videostore';
-        const key = 's3://project-videostore/potrait_sample.mp4';
+        const key = 'potrait_sample.mp4';
 
         // Parameters for the Rekognition video job
         const params = {
