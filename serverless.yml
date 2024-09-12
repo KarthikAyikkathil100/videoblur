@@ -43,3 +43,17 @@ functions:
           path: '/admin/get-job-data'
           method: 'get'
           cors: true
+  BlurFaceFunction:
+    name: ${self:custom.STAGE}-Admin-BlurFaceFunction
+    runtime: nodejs18.x
+    handler: './controllers/blur_face.handler'
+    role: 'arn:aws:iam::021891572638:role/masterrole'
+    package:
+      patterns:
+        - 'controllers/blur_face.js'
+        - 'package.json'
+    events:
+      - http:
+          path: '/admin/blur'
+          method: 'get'
+          cors: true
