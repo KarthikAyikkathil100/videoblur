@@ -1,13 +1,17 @@
-import boto3
 import cv2
 import os
-import time
 
-rekognition = boto3.client('rekognition')
-s3 = boto3.client('s3')
 
-# Constants
-BUCKET_NAME = 'project-videostore'
+# Define the path to the Haar cascade XML file
+haar_cascade_path = os.path.join(os.path.dirname(__file__), 'cascades', 'haarcascade_frontalface_default.xml')
+
+# Initialize the face cascade
+face_cascade = cv2.CascadeClassifier(haar_cascade_path)
+
+if face_cascade.empty():
+    raise Exception(f"Failed to load cascade classifier from {haar_cascade_path}")
+
+print(f"Cascade classifier loaded from {haar_cascade_path}")
 
 def download_video_from_s3(bucket, video_key, download_path):
     """Download video from S3 to /tmp/"""
@@ -19,17 +23,11 @@ def upload_video_to_s3(local_file, bucket, output_key):
     s3.upload_file(local_file, bucket, output_key)
     print(f"Blurred video uploaded to S3: {output_key}")
 
-def detect_faces_in_image(image):
-    """Detect faces in a single image using Rekognition"""
-    _, buffer = cv2.imencode('.jpg', image)
-    response = rekognition.detect_faces(
-        Image={'Bytes': buffer.tobytes()},
-        Attributes=['ALL']
-    )
-    return response['Faces']
-
 def blur_faces_in_video(input_video, output_video):
-    """Blur faces in video frames using OpenCV"""
+    """Blur faces in video frames using OpenCV and local face detection"""
+    # Load the pre-trained Haar Cascade classifier -- This is already initialized 
+    # face_cascade = cv2.CascadeClassifier(cv2.data.haarcascades + 'haarcascade_frontalface_default.xml')
+
     video = cv2.VideoCapture(input_video)
     output = cv2.VideoWriter(output_video, cv2.VideoWriter_fourcc(*'mp4v'), 30.0, 
                              (int(video.get(3)), int(video.get(4))))
@@ -38,22 +36,18 @@ def blur_faces_in_video(input_video, output_video):
         ret, frame = video.read()
         if not ret:
             break
-        
-        faces = detect_faces_in_image(frame)
 
         frame_height, frame_width = frame.shape[:2]
 
-        for faceT in faces:
-            face = faceT['BoundingBox']
+        # Convert the frame to grayscale for face detection
+        gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
 
-            # Convert bounding box coordinates to pixel values
-            left = int(face['Left'] * frame_width)
-            top = int(face['Top'] * frame_height)
-            width = int(face['Width'] * frame_width)
-            height = int(face['Height'] * frame_height)
+        # Detect faces in the frame
+        faces = face_cascade.detectMultiScale(gray, scaleFactor=1.1, minNeighbors=5, minSize=(30, 30))
 
+        for (x, y, w, h) in faces:
             # Extract face region
-            face_region = frame[top:top+height, left:left+width]
+            face_region = frame[y:y+h, x:x+w]
             if len(face_region) == 0:
                 continue
 
@@ -61,7 +55,7 @@ def blur_faces_in_video(input_video, output_video):
             blurred_face = cv2.GaussianBlur(face_region, (99, 99), 30)
 
             # Replace the face region with the blurred face
-            frame[top:top+height, left:left+width] = blurred_face
+            frame[y:y+h, x:x+w] = blurred_face
 
         # Write the frame to the output video
         output.write(frame)
