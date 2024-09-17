@@ -57,3 +57,17 @@ functions:
           path: '/admin/blur'
           method: 'get'
           cors: true
+  BlurFaceFunctionV2:
+    name: ${self:custom.STAGE}-Admin-BlurFaceFunctionV2
+    runtime: python3.9
+    handler: './controllers/blur_face_v2.handler'
+    role: 'arn:aws:iam::021891572638:role/masterrole'
+    package:
+      patterns:
+        - 'controllers/blur_face_v2.py'
+    events:
+      - http:
+          path: '/admin/blur/v2'
+          method: 'get'
+          cors: true
+
