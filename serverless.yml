@@ -7,6 +7,11 @@ provider:
   region: us-east-1
   stage: ${opt:stage}
   versionFunctions: false
+  ecr:
+    images:
+      appimage:
+        path: './images'
+
 
 custom:
   ACCOUNT_ID: !Ref AWS::AccountId
@@ -60,11 +65,11 @@ functions:
   BlurFaceFunctionV2:
     name: ${self:custom.STAGE}-Admin-BlurFaceFunctionV2
     runtime: python3.9
-    handler: './controllers/blur_face_v2.handler'
     role: 'arn:aws:iam::021891572638:role/masterrole'
-    package:
-      patterns:
-        - 'controllers/blur_face_v2.py'
+    image:
+      name: appimage
+      entryPoint:
+          - '/lambda-entrypoint.sh'
     events:
       - http:
           path: '/admin/blur/v2'

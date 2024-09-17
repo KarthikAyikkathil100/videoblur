@@ -1,0 +1,2 @@
+boto3
+opencv-python-headless  # This version of OpenCV doesn't include GUI functions, perfect for headless environments like Lambda
