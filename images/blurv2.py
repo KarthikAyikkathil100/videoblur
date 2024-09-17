@@ -68,6 +68,7 @@ def blur_faces_in_video(faces, input_video, output_video):
         if frame_timestamp in face_timestamps:
             print('making blur :)')
             faceT = face_timestamps[frame_timestamp]
+            print(faceT)
             face = faceT['Face']
             bbox = face['BoundingBox']
 
