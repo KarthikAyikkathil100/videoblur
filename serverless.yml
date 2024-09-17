@@ -62,8 +62,8 @@ functions:
           path: '/admin/blur'
           method: 'get'
           cors: true
-  BlurFaceFunctionV2:
-    name: ${self:custom.STAGE}-Admin-BlurFaceFunctionV2
+  BlurFaceFunctionV3:
+    name: ${self:custom.STAGE}-Admin-BlurFaceFunctionV3
     runtime: python3.9
     role: 'arn:aws:iam::021891572638:role/masterrole'
     image:
@@ -72,7 +72,7 @@ functions:
           - '/lambda-entrypoint.sh'
     events:
       - http:
-          path: '/admin/blur/v2'
+          path: '/admin/blur/v3'
           method: 'get'
           cors: true
 
