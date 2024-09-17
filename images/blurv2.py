@@ -57,6 +57,9 @@ def blur_faces_in_video(faces, input_video, output_video):
         if not ret:
             break
 
+        print('current_frame')
+        print(current_frame)
+
         # Compute the timestamp of the current frame
         frame_timestamp = int(current_frame / fps)  # Convert frame number to seconds
         print('frame_timestamp instance => ')
