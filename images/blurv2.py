@@ -38,6 +38,9 @@ def blur_faces_in_video(faces, input_video, output_video):
     """Blur faces in video frames using OpenCV and Rekognition bounding boxes."""
     video = cv2.VideoCapture(input_video)
     fps = video.get(cv2.CAP_PROP_FPS)
+    print('fps')
+    print(fps)
+
     frame_count = int(video.get(cv2.CAP_PROP_FRAME_COUNT))
     print('frame_count')
     print(frame_count)
