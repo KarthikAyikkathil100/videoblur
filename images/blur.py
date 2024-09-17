@@ -87,13 +87,20 @@ def lambda_handler(event, context):
     local_output_video = '/tmp/output_video.mp4'
 
     # 1. Download video from S3 to /tmp/
+    print('Download init')
     download_video_from_s3(s3_bucket, s3_video_key, local_input_video)
+    print('Download done')
 
     # 2. Get face detection results using the Job ID from Rekognition
+    print('Getting Job results')
     faces = get_face_detection_results(rekognition_job_id)
+    print('results fetched')
+    print(faces)
 
     # 3. Process video with OpenCV to blur detected faces
+    print('blur start')
     blur_faces_in_video(faces, local_input_video, local_output_video)
+    print('blur end')
 
     # 4. Upload blurred video back to S3
     upload_video_to_s3(local_output_video, s3_bucket, 'blurred-' + s3_video_key)
