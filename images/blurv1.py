@@ -1,6 +1,8 @@
 import cv2
 import os
+import boto3
 
+s3 = boto3.client('s3')
 
 # Define the path to the Haar cascade XML file
 haar_cascade_path = os.path.join(os.path.dirname(__file__), 'cascades', 'haarcascade_frontalface_default.xml')
