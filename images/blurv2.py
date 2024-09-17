@@ -39,10 +39,14 @@ def blur_faces_in_video(faces, input_video, output_video):
     video = cv2.VideoCapture(input_video)
     fps = video.get(cv2.CAP_PROP_FPS)
     frame_count = int(video.get(cv2.CAP_PROP_FRAME_COUNT))
+    print('frame_count')
+    print(frame_count)
     output = cv2.VideoWriter(output_video, cv2.VideoWriter_fourcc(*'mp4v'), fps, 
                              (int(video.get(3)), int(video.get(4))))
 
     face_timestamps = {int(face['Timestamp'] / 1000): face for face in faces}  # Convert ms to seconds
+    print('face_timestamps')
+    print(face_timestamps)
 
     current_frame = 0
     while True:
@@ -52,8 +56,11 @@ def blur_faces_in_video(faces, input_video, output_video):
 
         # Compute the timestamp of the current frame
         frame_timestamp = int(current_frame / fps)  # Convert frame number to seconds
+        print('frame_timestamp instance => ')
+        print(frame_timestamp)
 
         if frame_timestamp in face_timestamps:
+            print('making blur :)')
             faceT = face_timestamps[frame_timestamp]
             face = faceT['Face']
             bbox = face['BoundingBox']
