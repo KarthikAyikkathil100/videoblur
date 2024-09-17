@@ -62,6 +62,8 @@ def blur_faces_in_video(faces, input_video, output_video):
             face_region = frame[top:top+height, left:left+width]
             print('face_region - ')
             print(face_region)
+            if not face_region:
+                continue
 
             # Apply Gaussian blur to the face region
             blurred_face = cv2.GaussianBlur(face_region, (99, 99), 30)
