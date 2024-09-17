@@ -95,6 +95,7 @@ def lambda_handler(event, context):
     print('get face resultes -- init')
     faces = get_face_detection_results(rekognition_job_id)
     print('get face resultes -- done')
+    print(faces)
 
     # 3. Process video with OpenCV to blur detected faces
     print('blur init')
