@@ -79,7 +79,7 @@ def lambda_handler(event, context):
     
     # Extract video details from the event (assuming S3 event)
     s3_bucket = 'project-videostore'
-    s3_video_key = 'potrait_sample.mp4'
+    s3_video_key = 'miami-bl.mp4'
     
     # Extract the Rekognition Job ID from the event
     rekognition_job_id = '5e69dd3ba11ff88022dc19ed6f925bec2214bca26d529487765ab9c763acd9bb'
