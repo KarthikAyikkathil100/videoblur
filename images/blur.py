@@ -47,7 +47,8 @@ def blur_faces_in_video(faces, input_video, output_video):
 
         frame_height, frame_width = frame.shape[:2]
 
-        for face in faces:
+        for faceT in faces:
+            face = faceT.Face
             bbox = face['BoundingBox']
 
             # Convert bounding box coordinates to pixel values
