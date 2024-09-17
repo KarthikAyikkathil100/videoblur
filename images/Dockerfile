@@ -12,4 +12,4 @@ RUN pip install -r requirements.txt
 COPY . .
 
 # Set the CMD to the Lambda function handler
-CMD ["blur.lambda_handler"]
+CMD ["blurv1.lambda_handler"]
