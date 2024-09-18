@@ -81,10 +81,10 @@ def lambda_function(event, context):
         print(e)
         # continue
 
-    try:
-        integrate_audio(local_filename, local_filename_output)
-    except Exception as e:
-        print(e)
+    # try:
+    #     integrate_audio(local_filename, local_filename_output)
+    # except Exception as e:
+    #     print(e)
 
     # uploaded modified video to Amazon S3 bucket
     try:
