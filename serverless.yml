@@ -11,6 +11,8 @@ provider:
     images:
       appimage:
         path: './images'
+      blurnext:
+        path: './blurnext'
 
 
 custom:
@@ -75,4 +77,18 @@ functions:
           path: '/admin/blur/v3'
           method: 'get'
           cors: true
+  BlurFaceFunctionV4:
+    name: ${self:custom.STAGE}-Admin-BlurFaceFunctionV4
+    runtime: python3.9
+    role: 'arn:aws:iam::021891572638:role/masterrole'
+    image:
+      name: blurnext
+      entryPoint:
+          - '/lambda-entrypoint.sh'
+    events:
+      - http:
+          path: '/admin/blur/v4'
+          method: 'get'
+          cors: true
+
 
