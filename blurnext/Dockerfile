@@ -4,7 +4,12 @@ FROM public.ecr.aws/lambda/python:3.8
 # the requirements in the app directory.
 
 # Install FFmpeg
-RUN yum -y install ffmpeg
+RUN wget https://johnvansickle.com/ffmpeg/releases/ffmpeg-release-i686-static.tar.xz && \
+    tar -xvf ffmpeg-release-i686-static.tar.xz && \
+    cp ffmpeg-*/ffmpeg /usr/bin/ && \
+    cp ffmpeg-*/ffprobe /usr/bin/ && \
+    rm -rf ffmpeg-* && \
+    rm ffmpeg-release-i686-static.tar.xz
 
 COPY requirements.txt  .
 RUN  pip install -r requirements.txt
