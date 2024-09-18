@@ -4,14 +4,13 @@ FROM public.ecr.aws/lambda/python:3.8
 # the requirements in the app directory.
 
 # Install required system packages
-RUN yum install -y curl tar && \
-    yum clean all
+RUN yum install -y curl tar && yum clean all
 
 # Download and install FFmpeg
-RUN curl -L https://johnvansickle.com/ffmpeg/releases/ffmpeg-release-amd64-static.tar.xz -o /tmp/ffmpeg.tar.xz && \
+RUN curl -L https://github.com/FFmpeg/FFmpeg/releases/download/n5.1.2/ffmpeg-release-amd64-static.tar.xz -o /tmp/ffmpeg.tar.xz && \
     tar -xvf /tmp/ffmpeg.tar.xz -C /tmp && \
-    cp /tmp/ffmpeg-*/ffmpeg /usr/bin/ && \
-    cp /tmp/ffmpeg-*/ffprobe /usr/bin/ && \
+    cp /tmp/ffmpeg-*-static/ffmpeg /usr/bin/ && \
+    cp /tmp/ffmpeg-*-static/ffprobe /usr/bin/ && \
     rm -rf /tmp/ffmpeg-* /tmp/ffmpeg.tar.xz
 
 COPY requirements.txt  .
