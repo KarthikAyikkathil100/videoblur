@@ -3,6 +3,9 @@ FROM public.ecr.aws/lambda/python:3.8
 # Copy file requirements.txt from your project folder and install
 # the requirements in the app directory.
 
+# Install FFmpeg
+RUN yum -y install ffmpeg
+
 COPY requirements.txt  .
 RUN  pip install -r requirements.txt
 
