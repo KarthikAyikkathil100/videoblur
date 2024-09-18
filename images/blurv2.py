@@ -107,7 +107,7 @@ def lambda_handler(event, context):
     s3_video_key = 'people2.mp4'
     
     # Extract the Rekognition Job ID from the event
-    rekognition_job_id = '9d18da03168822b67e29abbe95391bedd9d166626b78d1f6d2a615b7cea32a20'
+    rekognition_job_id = '555baec6f49361280584c2aafc82e19fa75480afd697f5984df70552114b404e'
 
     # Paths for downloading and processing
     local_input_video = '/tmp/input_video.mp4'
