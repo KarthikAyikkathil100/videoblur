@@ -50,7 +50,7 @@ def get_timestamps_and_faces(job_id):
 def lambda_function(event, context):
     # download file locally to /tmp retrieve metadata
     try:
-        timestamps, response = get_timestamps_and_faces('9d0e1f93dcaace21ca46e3232ecbe51b86c17ad29e4e7c89d3e000163adb8f21')
+        timestamps, response = get_timestamps_and_faces('aac512fe9c6431a8876de131d43637711abb96df167c3b24446cef243986c2c2')
         print('Final response => ')
         print(response)
         print('final timestamps')
