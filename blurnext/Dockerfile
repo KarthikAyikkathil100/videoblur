@@ -1,13 +1,11 @@
-FROM public.ecr.aws/lambda/python:3.8
+FROM public.ecr.aws/lambda/python:3.9
 # Install the function's dependencies
 # Copy file requirements.txt from your project folder and install
 # the requirements in the app directory.
 
 # Install EPEL and FFmpeg
-RUN yum -y install amazon-linux-extras && \
-    amazon-linux-extras install epel -y && \
-    yum -y install ffmpeg && \
-    yum clean all
+# Install necessary system dependencies for OpenCV
+RUN yum -y install libjpeg-turbo libpng libtiff libdc1394 ffmpeg
 
 COPY requirements.txt  .
 RUN  pip install -r requirements.txt
