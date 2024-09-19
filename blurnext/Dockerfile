@@ -5,7 +5,7 @@ FROM public.ecr.aws/lambda/python:3.9
 
 # Install EPEL and FFmpeg
 # Install necessary system dependencies for OpenCV
-RUN yum -y install libjpeg-turbo libpng libtiff libdc1394 ffmpeg
+RUN yum -y install libjpeg-turbo libpng libtiff libdc1394 libx264-dev ffmpeg
 
 COPY requirements.txt  .
 RUN  pip install -r requirements.txt
