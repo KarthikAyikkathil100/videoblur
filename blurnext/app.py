@@ -82,7 +82,9 @@ def lambda_function(event, context):
 
         # get timestamps
     try:
+        print('face blur start')
         apply_faces_to_video(timestamps, local_filename, local_filename_output, response["VideoMetadata"])
+        print('face blur done !!')
     except Exception as e:
         print(e)
         # continue
