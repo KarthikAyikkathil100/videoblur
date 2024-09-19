@@ -1,26 +1,20 @@
-# Use the official Ubuntu base image
-FROM ubuntu:20.04
+FROM public.ecr.aws/lambda/python:3.9
+# Install the function's dependencies
+# Copy file requirements.txt from your project folder and install
+# the requirements in the app directory.
 
-# Install Python and necessary system dependencies for OpenCV and FFmpeg
-RUN apt-get update && \
-    apt-get install -y python3 python3-pip \
-    libjpeg-turbo8-dev \
-    libpng-dev \
-    libtiff-dev \
-    libdc1394-22-dev \
-    libx264-dev \
-    ffmpeg && \
-    rm -rf /var/lib/apt/lists/*
+# Install EPEL and FFmpeg
+# Install necessary system dependencies for OpenCV
+RUN yum -y install libjpeg-turbo libpng libtiff libdc1394 libx264-dev ffmpeg
 
-# Copy requirements.txt and install the Python dependencies
-COPY requirements.txt ./
-RUN pip3 install --no-cache-dir -r requirements.txt
+COPY requirements.txt  .
+RUN  pip install -r requirements.txt
 
 # Copy helper functions
 COPY video_processor.py video_processor.py
 
-# Copy handler function
-COPY app.py .
+# Copy handler function (from the local app directory)
+COPY  app.py  .
 
-# Specify the command to run the application
-CMD ["python3", "app.py"]
+# Overwrite the command by providing a different command directly in the template.
+CMD ["app.lambda_function"]
