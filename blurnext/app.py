@@ -70,8 +70,8 @@ def lambda_function(event, context):
         s3.download_file(bucket, key, local_filename)
 
         # Retrieve the MIME type (ContentType) of the object
-        response = s3.head_object(Bucket=bucket, Key=key)
-        mime_type = response['ContentType']
+        metaData = s3.head_object(Bucket=bucket, Key=key)
+        mime_type = metaData['ContentType']
         print('The mime of downloaded video --')
         print(mime_type)
     except botocore.exceptions.ClientError:
@@ -96,8 +96,8 @@ def lambda_function(event, context):
 
     # uploaded modified video to Amazon S3 bucket
     try:
-        # s3.upload_file(local_filename_output, output_bucket, 'blurredxx-'+key, ExtraArgs={'ContentType': mime_type})
-        s3.upload_file(local_filename_output, output_bucket, 'blurredxx-'+key)
+        s3.upload_file(local_filename_output, output_bucket, 'blurredxx-'+key, ExtraArgs={'ContentType': mime_type})
+        # s3.upload_file(local_filename_output, output_bucket, 'blurredxx-'+key)
     except boto3.exceptions.S3UploadFailedError:
         error_message = 'Lambda role does not have permission to call PutObject for the output S3 bucket.'
         # add_failed(bucket, error_message, failed_records, key)
