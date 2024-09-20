@@ -23,7 +23,7 @@ ENV PATH=/opt/conda/bin:$PATH
 
 # Install OpenCV
 # RUN conda install -c conda-forge opencv-python
-RUN conda install opencv
+RUN conda install openCv
 
 # RUN conda config --add channels conda-forge
 # RUN conda create --name opencv
