@@ -1,35 +1,20 @@
-# Use Amazon Linux 2 as the base image
-FROM amazonlinux:2
+FROM public.ecr.aws/lambda/python:3.9
+# Install the function's dependencies
+# Copy file requirements.txt from your project folder and install
+# the requirements in the app directory.
 
-# Install Miniconda
-RUN yum install -y bzip2 && \
-    curl -LO https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh && \
-    bash Miniconda3-latest-Linux-x86_64.sh -b -p /opt/conda && \
-    rm Miniconda3-latest-Linux-x86_64.sh
+# Install EPEL and FFmpeg
+# Install necessary system dependencies for OpenCV
+RUN yum -y install libjpeg-turbo libpng libtiff libdc1394 libx264-dev ffmpeg
 
-# Set environment variables
-ENV PATH=/opt/conda/bin:$PATH
+COPY requirements.txt  .
+RUN  pip install -r requirements.txt
 
-# Create a new conda environment and install required libraries
-RUN conda create -n myenv python=3.9 opencv ffmpeg numpy imageio pillow -y && \
-    conda clean -afy
+# Copy helper functions
+COPY video_processor.py video_processor.py
 
-# Install pip in the conda environment
-RUN conda install -n myenv pip -y
+# Copy handler function (from the local app directory)
+COPY  app.py  .
 
-# Install MoviePy using pip
-RUN /opt/conda/bin/pip install moviepy
-
-# Install additional packages using pip from requirements.txt
-COPY requirements.txt .
-RUN /opt/conda/bin/pip install -r requirements.txt
-
-# Copy your application code
-COPY video_processor.py .
-COPY app.py .
-
-# Set the working directory
-WORKDIR /app
-
-# Set the entrypoint to use the conda environment and point to the Lambda handler
-CMD ["bash", "-c", "source activate myenv && python -m awslambdaric app.lambda_function"]
+# Overwrite the command by providing a different command directly in the template.
+CMD ["app.lambda_function"]
