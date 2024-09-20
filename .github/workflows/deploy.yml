@@ -9,7 +9,7 @@ jobs:
   deploy_development:
     runs-on: ubuntu-latest
     if: github.ref == 'refs/heads/dev' 
-    timeout-minutes: 5
+    timeout-minutes: 15
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
