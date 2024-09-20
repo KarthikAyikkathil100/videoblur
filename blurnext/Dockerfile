@@ -22,7 +22,7 @@ RUN yum install -y curl && \
 ENV PATH=/opt/conda/bin:$PATH
 
 # Install OpenCV
-RUN conda install -c conda-forge opencv
+RUN conda install -c conda-forge opencv-python
 
 
 
