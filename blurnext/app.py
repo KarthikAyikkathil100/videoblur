@@ -6,6 +6,9 @@ import boto3
 import botocore
 import cv2
 
+os.system("source /opt/conda/bin/activate base")
+
+
 from video_processor import apply_faces_to_video, integrate_audio
 
 logger = logging.getLogger()
