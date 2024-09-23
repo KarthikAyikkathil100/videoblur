@@ -44,4 +44,4 @@ COPY app.py .
 # CMD ["app.lambda_function"]
 # CMD ["conda", "run", "-n", "envname", "python", "app.py"]
 
-CMD ["conda", "run", "-n", "envname", "app.lambda_function"]
+CMD ["app.lambda_function"]
