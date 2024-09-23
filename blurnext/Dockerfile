@@ -9,7 +9,7 @@
 FROM continuumio/miniconda3
 
 # Set the working directory
-WORKDIR /app
+# WORKDIR /app
 
 # Copy the environment.yml file to the container
 COPY environment.yml .
