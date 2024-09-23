@@ -23,15 +23,19 @@ output_bucket = 'project-videostore'
 
 
 def convert_to_h264(input_file, output_file):
-    command = [
-        'ffmpeg',
-        '-i', input_file,
-        '-c:v', 'libx264',  # Specify H.264 codec
-        '-preset', 'fast',   # Use a fast preset (you can adjust this)
-        '-crf', '23',        # Set quality (lower means better quality, range 0-51)
-        output_file
-    ]
-    subprocess.run(command, check=True)
+    try:
+
+        command = [
+            'ffmpeg',
+            '-i', input_file,
+            '-c:v', 'libx264',  # Specify H.264 codec
+            '-preset', 'fast',   # Use a fast preset (you can adjust this)
+            '-crf', '23',        # Set quality (lower means better quality, range 0-51)
+            output_file
+        ]
+        subprocess.run(command, check=True)
+    except Exception as e:
+        print(e)
 
 def get_timestamps_and_faces(job_id):
     final_timestamps = {}
@@ -115,6 +119,10 @@ def lambda_function(event, context):
     # uploaded modified video to Amazon S3 bucket
     try:
         print('ffmpeg process started')
+        print('input file name => ')
+        print(local_filename_output)
+        print('output file name')
+        print(local_codec_output)
         convert_to_h264(local_filename_output, local_codec_output)
         print('ffmpeg process end !')
         s3.upload_file(local_codec_output, output_bucket, 'blurredxx-'+key, ExtraArgs={'ContentType': mime_type})
