@@ -5,6 +5,7 @@ dependencies:
   - python=3.9  # Specify Python version
   - opencv  
   - pip
+  - ffmpeg
   - pip:
       - boto3
       - moviepy

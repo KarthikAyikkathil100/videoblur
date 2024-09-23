@@ -21,6 +21,18 @@ s3 = boto3.client('s3')
 
 output_bucket = 'project-videostore'
 
+
+def convert_to_h264(input_file, output_file):
+    command = [
+        'ffmpeg',
+        '-i', input_file,
+        '-c:v', 'libx264',  # Specify H.264 codec
+        '-preset', 'fast',   # Use a fast preset (you can adjust this)
+        '-crf', '23',        # Set quality (lower means better quality, range 0-51)
+        output_file
+    ]
+    subprocess.run(command, check=True)
+
 def get_timestamps_and_faces(job_id):
     final_timestamps = {}
     next_token = "Y"
@@ -66,6 +78,7 @@ def lambda_function(event, context):
         filename = key
         local_filename = '/tmp/{}'.format(filename)
         local_filename_output = '/tmp/anonymized-{}'.format(filename)
+        local_codec_output = '/tmp/codec/anonymized-{}'.format(filename)
     except KeyError:
         error_message = 'Lambda invoked without S3 event data. Event needs to reference a S3 bucket and object key.'
         logger.log(logging.ERROR, error_message)
@@ -101,7 +114,10 @@ def lambda_function(event, context):
 
     # uploaded modified video to Amazon S3 bucket
     try:
-        s3.upload_file(local_filename_output, output_bucket, 'blurredxx-'+key, ExtraArgs={'ContentType': mime_type})
+        print('ffmpeg process started')
+        convert_to_h264(local_filename_output, local_codec_output)
+        print('ffmpeg process end !')
+        s3.upload_file(local_codec_output, output_bucket, 'blurredxx-'+key, ExtraArgs={'ContentType': mime_type})
         # s3.upload_file(local_filename_output, output_bucket, 'blurredxx-'+key)
     except boto3.exceptions.S3UploadFailedError:
         error_message = 'Lambda role does not have permission to call PutObject for the output S3 bucket.'
