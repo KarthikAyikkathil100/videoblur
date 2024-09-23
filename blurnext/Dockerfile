@@ -1,28 +1,23 @@
-# FROM continuumio/miniconda3
-# COPY environment.yml .
-# RUN conda env create -f environment.yml
-# RUN echo "source activate devenv" > ~/.bashrc
-# CMD ["app.lambda_function"]
+FROM public.ecr.aws/lambda/python:3.9
 
+# Install necessary system dependencies for OpenCV and other libraries
+RUN yum update -y && yum install -y wget && yum clean all
 
-# Use the official Miniconda3 image
-FROM continuumio/miniconda3
+RUN wget https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh -o miniconda.sh && sh Miniconda3-latest-Linux-x86_64.sh -b -p /opt/miniconda
 
-# Set the working directory
-# WORKDIR /app
+# Add Conda to the PATH
+# ENV PATH=/opt/conda/bin:$PATH
 
-# Copy the environment.yml file to the container
-COPY environment.yml .
+COPY environment.yml /tmp/environment.yml
 
-# Create the conda environment
-RUN conda env create -f environment.yml
+RUN /opt/miniconda/bin/conda env create --file /tmp/environment.yml --prefix /opt/conda-env
 
-# Activate the environment and ensure it's the default
-RUN echo "source activate devenv" > ~/.bashrc
-ENV PATH /opt/conda/envs/devenv/bin:$PATH
+RUN /opt/conda-env/bin/pip install awslambdaric
 
-# Copy your application code to the container
-COPY . .
+# We now replace the image’s existing Python with Python from the conda environment:
+RUN mv /var/lang/bin/python3.9 /var/lang/bin/python3.9-clean && ln -sf /opt/conda-env/bin/python /var/lang/bin/python3.9
+COPY app.py /opt/my-code/app.py
+COPY video_processor.py /opt/my-code/video_processor.py
+ENV PYTHONPATH "/var/lang/lib/python3.9/site-packages:/opt/my-code"
 
-# Command to run your application (adjust as necessary)
 CMD ["app.lambda_function"]
