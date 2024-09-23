@@ -1,8 +1,8 @@
-os.system("source /opt/conda/bin/activate envname")
-
 import json
 import logging
 import os
+
+os.system("source /opt/conda/bin/activate envname")
 
 import boto3
 import botocore
