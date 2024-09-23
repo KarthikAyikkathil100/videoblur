@@ -1,0 +1,12 @@
+name: devenv
+channels:
+  - conda-forge  # Channel to source packages from
+dependencies:
+  - python=3.9  # Specify Python version
+  - opencv  
+  - pip
+  - pip:
+      - boto3
+      - moviepy
+      - requests
+      - tqdm
