@@ -25,4 +25,4 @@ ENV PATH /opt/conda/envs/devenv/bin:$PATH
 COPY . .
 
 # Command to run your application (adjust as necessary)
-CMD ["python", "-m", "app.lambda_function"]
+CMD ["app.lambda_function"]
