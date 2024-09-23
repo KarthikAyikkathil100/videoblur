@@ -7,7 +7,6 @@ import os
 import boto3
 import botocore
 import cv2
-import ffmpeg
 
 
 
@@ -62,6 +61,8 @@ def get_timestamps_and_faces(job_id):
 def lambda_function(event, context):
     # download file locally to /tmp retrieve metadata
     try:
+        output = subprocess.check_output(['ffmpeg', '-version'])
+        print(output.decode('utf-8'))
         timestamps, response = get_timestamps_and_faces('aac512fe9c6431a8876de131d43637711abb96df167c3b24446cef243986c2c2')
         print('Final response => ')
         print(response)
