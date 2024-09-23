@@ -7,7 +7,7 @@ import os
 import boto3
 import botocore
 import cv2
-import subprocess
+import ffmpeg
 
 
 
@@ -24,16 +24,7 @@ output_bucket = 'project-videostore'
 
 def convert_to_h264(input_file, output_file):
     try:
-
-        command = [
-            'ffmpeg',
-            '-i', input_file,
-            '-c:v', 'libx264',  # Specify H.264 codec
-            '-preset', 'fast',   # Use a fast preset (you can adjust this)
-            '-crf', '23',        # Set quality (lower means better quality, range 0-51)
-            output_file
-        ]
-        subprocess.run(command, check=True)
+        ffmpeg.input(input_file).output(output_file, codec='libx264').run()
     except Exception as e:
         print(e)
 
