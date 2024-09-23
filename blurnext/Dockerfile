@@ -41,4 +41,6 @@ COPY video_processor.py .
 COPY app.py .
 
 # Overwrite the command by providing a different command directly in the template.
-CMD ["app.lambda_function"]
+# CMD ["app.lambda_function"]
+CMD ["conda", "run", "-n", "envname", "python", "app.py"]
+
