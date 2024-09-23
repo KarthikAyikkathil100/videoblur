@@ -44,7 +44,7 @@ def apply_faces_to_video(final_timestamps, local_path_to_video, local_output, vi
     height_delta = int(frame_height / 100)
     # Set up support for OpenCV
     frame_counter = 0
-    fourcc = cv2.VideoWriter_fourcc(*'x264')
+    fourcc = cv2.VideoWriter_fourcc(*'h264')
     # Create the file pointers
     v = cv2.VideoCapture(local_path_to_video)
     print("VideoCapture - local path to video")
