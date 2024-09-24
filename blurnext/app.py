@@ -17,6 +17,9 @@ import shutil
 
 from video_processor import apply_faces_to_video, integrate_audio
 
+# Add conda environment's bin directory to PATH
+os.environ["PATH"] += os.pathsep + "/opt/conda-env/bin"
+
 logger = logging.getLogger()
 logger.setLevel(logging.INFO)
 
