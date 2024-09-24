@@ -1,7 +1,8 @@
 FROM public.ecr.aws/lambda/python:3.9
 
 # Install necessary system dependencies for OpenCV and other libraries
-RUN yum update -y && yum install -y wget && yum clean all
+# RUN yum update -y && yum install -y wget && yum clean all
+RUN yum update -y && yum install -y wget which && yum clean all
 
 RUN wget https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh -o miniconda.sh && sh Miniconda3-latest-Linux-x86_64.sh -b -p /opt/miniconda
 
