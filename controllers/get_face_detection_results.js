@@ -6,7 +6,7 @@ exports.handler = async (event) => {
 
     try {
         // Check the status of the job using `getFaceDetection`
-        const jobId = 'a74cb4f0ec6027a4160248bd3b9df62121e54ea0eb1fef091ed527a2d5071905'
+        const jobId = '2e06bde9b09be025358a9534e7034fcfa1fc5de6ac789fb19e5014228803c2d9'
         const statusResponse = await rekognition.getFaceDetection({ JobId: jobId }).promise();
         console.log('statusResponse => ', statusResponse)
 
