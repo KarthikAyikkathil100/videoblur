@@ -1,6 +1,8 @@
 import json
 import logging
 import os
+import sys
+
 
 # os.system("source /opt/conda/bin/activate envname")
 
@@ -62,6 +64,9 @@ def get_timestamps_and_faces(job_id):
 def lambda_function(event, context):
     # download file locally to /tmp retrieve metadata
     try:
+        platform = sys.platform
+        print('platform')
+        print(platform)
         output = subprocess.check_output(['which', 'ffmpeg'])
         print(output.decode('utf-8'))
         timestamps, response = get_timestamps_and_faces('aac512fe9c6431a8876de131d43637711abb96df167c3b24446cef243986c2c2')
