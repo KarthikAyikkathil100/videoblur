@@ -10,6 +10,7 @@ import boto3
 import botocore
 import cv2
 import subprocess
+import ffmpeg
 
 
 
@@ -67,8 +68,8 @@ def lambda_function(event, context):
         platform = sys.platform
         print('platform')
         print(platform)
-        output = subprocess.check_output(['ffmpeg', '-version'])
-        print(output.decode('utf-8'))
+        print('ffmpeg version')
+        print(ffmpeg.__version__)
         timestamps, response = get_timestamps_and_faces('aac512fe9c6431a8876de131d43637711abb96df167c3b24446cef243986c2c2')
         print('Final response => ')
         print(response)
