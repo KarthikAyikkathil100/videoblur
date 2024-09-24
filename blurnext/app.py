@@ -88,7 +88,7 @@ def lambda_function(event, context):
         filename = key
         local_filename = '/tmp/{}'.format(filename)
         local_filename_output = '/tmp/anonymized-{}'.format(filename)
-        local_codec_output = '/tmp/codec/anonymized-{}'.format(filename)
+        local_codec_output = '/tmp/codec-{}'.format(filename)
     except KeyError:
         error_message = 'Lambda invoked without S3 event data. Event needs to reference a S3 bucket and object key.'
         logger.log(logging.ERROR, error_message)
