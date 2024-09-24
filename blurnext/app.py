@@ -68,8 +68,12 @@ def lambda_function(event, context):
         platform = sys.platform
         print('platform')
         print(platform)
-        print('ffmpeg version')
+        print('ffmpeg')
         print(ffmpeg)
+        output = subprocess.check_output(['which', 'ffmpeg'], stderr=subprocess.STDOUT)
+        ffmpeg_path = output.decode('utf-8').strip()
+        print('which ffmpeg')
+        print(ffmpeg_path)
         timestamps, response = get_timestamps_and_faces('aac512fe9c6431a8876de131d43637711abb96df167c3b24446cef243986c2c2')
         print('Final response => ')
         print(response)
