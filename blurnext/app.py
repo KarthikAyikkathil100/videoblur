@@ -84,7 +84,7 @@ def lambda_function(event, context):
         print(timestamps)
         # get metadata of file uploaded to Amazon S3
         bucket = 'project-videostore'
-        key = 'airport.mp4'
+        key = 'airport 480.mp4'
         filename = key
         local_filename = '/tmp/{}'.format(filename)
         local_filename_output = '/tmp/anonymized-{}'.format(filename)
