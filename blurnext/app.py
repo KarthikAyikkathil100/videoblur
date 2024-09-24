@@ -11,6 +11,7 @@ import botocore
 import cv2
 import subprocess
 import ffmpeg
+import shutil
 
 
 
@@ -70,8 +71,7 @@ def lambda_function(event, context):
         print(platform)
         print('ffmpeg')
         print(ffmpeg)
-        output = subprocess.check_output(['which', 'ffmpeg'], stderr=subprocess.STDOUT)
-        ffmpeg_path = output.decode('utf-8').strip()
+        ffmpeg_path = shutil.which("ffmpeg")
         print('which ffmpeg')
         print(ffmpeg_path)
         timestamps, response = get_timestamps_and_faces('aac512fe9c6431a8876de131d43637711abb96df167c3b24446cef243986c2c2')

@@ -4,6 +4,7 @@ channels:
 dependencies:
   - python=3.9  # Specify Python version
   - opencv
+  - ffmpeg 
   - pip
   - pip:
       - boto3
