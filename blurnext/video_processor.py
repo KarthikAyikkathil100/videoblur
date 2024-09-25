@@ -29,7 +29,7 @@ def anonymize_face_pixelate(image, blocks=30):
             # compute the mean of the ROI 
             (b, g, r) = [int(x) for x in cv2.mean(roi)[:3]]
             # draw a rectangle with the mean RGB values over the ROI in the original image
-            # cv2.rectangle(image, (first_x, first_y), (last_x, last_y), (b, g, r), -1)
+            cv2.rectangle(image, (first_x, first_y), (last_x, last_y), (b, g, r), -1)
 
     # return the pixelated blurred image
     return image
