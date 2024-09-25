@@ -64,7 +64,8 @@ def apply_faces_to_video(final_timestamps, local_path_to_video, local_output, vi
         has_frame, frame = v.read()
         if not has_frame:
             break
-        if frame_counter % frame_skip == 0:
+        # if frame_counter % frame_skip == 0:
+        if frame_counter:
             blurred_this_frame = False
             frame_queue = deque(maxlen=sliding_window_size)
             frame_queue.append(frame)
@@ -115,7 +116,7 @@ def apply_faces_to_video(final_timestamps, local_path_to_video, local_output, vi
                         prev_frame[y1:y2, x1:x2] = blurred_prev
 
                         # Optionally, you can draw rectangles on previous frames
-                        cv2.rectangle(prev_frame, (x, y), (x + w, y + h), (255, 0, 0), 3)
+                        # cv2.rectangle(prev_frame, (x, y), (x + w, y + h), (255, 0, 0), 3)
 
             # Write the processed frame to the output
             out.write(frame)
