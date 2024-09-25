@@ -77,7 +77,7 @@ def lambda_function(event, context):
         ffmpeg_path = shutil.which("ffmpeg")
         print('which ffmpeg')
         print(ffmpeg_path)
-        timestamps, response = get_timestamps_and_faces('76a5c0043fce89b945c45e1a6adaabec0c3943940a52f186b9cc0f0c9d026111')
+        timestamps, response = get_timestamps_and_faces('24d72a1c99791f296bdd1597fed015b6445e358fc24ce03f15b03075a2e89f54')
         print('Final response => ')
         print(response)
         print('final timestamps')
