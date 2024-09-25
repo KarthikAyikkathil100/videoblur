@@ -58,52 +58,47 @@ def apply_faces_to_video(final_timestamps, local_path_to_video, local_output, vi
     # Open the video
     while v.isOpened():
         has_frame, frame = v.read()
-        if has_frame:
-            # Create a flag to track if any face has been blurred
-            blurred_this_frame = False
-            
-            for t in final_timestamps:
-                faces = final_timestamps.get(t)
-                lower_bound = int(int(t) / 1000 * frame_rate)
-                upper_bound = int(int(t) / 1000 * frame_rate + frame_rate / 2) + 1
-                
-                # Check if the current frame falls within the blur range
-                if (frame_counter >= lower_bound) and (frame_counter <= upper_bound):
-                    for f in faces:
-                        x = int(f['Left'] * frame_width) - width_delta
-                        y = int(f['Top'] * frame_height) - height_delta
-                        w = int(f['Width'] * frame_width) + 2 * width_delta
-                        h = int(f['Height'] * frame_height) + 2 * height_delta
-
-                        x1, y1 = x, y
-                        x2, y2 = x1 + w, y1 + h
-
-                        to_blur = frame[y1:y2, x1:x2]
-                        blurred = anonymize_face_pixelate(to_blur, blocks=10)
-                        frame[y1:y2, x1:x2] = blurred
-
-                        # Draw the rectangle
-                        frame = cv2.rectangle(frame, (x, y), (x + w, y + h), (255, 0, 0), 3)
-                        blurred_this_frame = True
-
-            # Optionally, if a face was blurred, you can also blur nearby frames
-            if blurred_this_frame:
-                # Here, you might want to blur the next few frames
-                # Example: for the next frame
-                for _ in range(1, 3):  # Adjust how many subsequent frames you want to blur
-                    has_frame, next_frame = v.read()
-                    if has_frame:
-                        # Repeat the blurring logic
-                        for t in final_timestamps:
-                            faces = final_timestamps.get(t)
-                            # You can implement similar logic to apply the blur to next frames
-                            # If needed, adjust the bounding box based on detected faces
-                        out.write(next_frame)
-            
-            out.write(frame)
-            frame_counter += 1
-        else:
+        if not has_frame:
             break
+
+        blurred_this_frame = False
+        
+        for t in final_timestamps:
+            faces = final_timestamps.get(t)
+            lower_bound = int(int(t) / 1000 * frame_rate)
+            upper_bound = int(int(t) / 1000 * frame_rate + frame_rate / 2) + 1
+            
+            if lower_bound <= frame_counter <= upper_bound:
+                for f in faces:
+                    x = int(f['Left'] * frame_width) - width_delta
+                    y = int(f['Top'] * frame_height) - height_delta
+                    w = int(f['Width'] * frame_width) + 2 * width_delta
+                    h = int(f['Height'] * frame_height) + 2 * height_delta
+
+                    # Ensure bounding box is within frame dimensions
+                    x1, y1 = max(x, 0), max(y, 0)
+                    x2, y2 = min(x1 + w, frame_width), min(y1 + h, frame_height)
+
+                    to_blur = frame[y1:y2, x1:x2]
+                    blurred = anonymize_face_pixelate(to_blur, blocks=10)
+                    frame[y1:y2, x1:x2] = blurred
+
+                    # Draw rectangle
+                    cv2.rectangle(frame, (x, y), (x + w, y + h), (255, 0, 0), 3)
+                    blurred_this_frame = True
+
+        # Write the processed frame to the output
+        out.write(frame)
+        frame_counter += 1
+
+        # Optionally, you can show the frame for debugging
+        # cv2.imshow('Frame', frame)
+        # if cv2.waitKey(1) & 0xFF == ord('q'):
+        #     break
+
+    # Clean up
+    v.release()
+    out.release()
 
     out.release()
     v.release()
