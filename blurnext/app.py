@@ -77,14 +77,14 @@ def lambda_function(event, context):
         ffmpeg_path = shutil.which("ffmpeg")
         print('which ffmpeg')
         print(ffmpeg_path)
-        timestamps, response = get_timestamps_and_faces('5fa32883dd8e984073ef8ea7e4f340a18a9113de93aa30db59c755aa65196127')
+        timestamps, response = get_timestamps_and_faces('24d72a1c99791f296bdd1597fed015b6445e358fc24ce03f15b03075a2e89f54')
         print('Final response => ')
         print(response)
         print('final timestamps')
         print(timestamps)
         # get metadata of file uploaded to Amazon S3
         bucket = 'project-videostore'
-        key = 'walking_speed.mp4'
+        key = 'airport 480.mp4'
         filename = key
         local_filename = '/tmp/{}'.format(filename)
         local_filename_output = '/tmp/anonymized-{}'.format(filename)
