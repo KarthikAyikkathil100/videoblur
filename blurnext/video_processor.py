@@ -65,7 +65,8 @@ def apply_faces_to_video(final_timestamps, local_path_to_video, local_output, vi
             for t in final_timestamps:
                 faces = final_timestamps.get(t)
                 lower_bound = int(int(t) / 1000 * frame_rate)
-                upper_bound = int(int(t) / 1000 * frame_rate + frame_rate / 2) + 1
+                # upper_bound = int(int(t) / 1000 * frame_rate + frame_rate / 2) + 1
+                upper_bound = int(int(t) / 1000 * frame_rate + frame_rate) + 1
 
                 if (frame_counter >= lower_bound) and (frame_counter <= upper_bound):
                     for f in faces:
