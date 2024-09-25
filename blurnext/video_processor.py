@@ -36,16 +36,18 @@ def anonymize_face_pixelate(image, blocks=30):
     return image
 
 
-def apply_faces_to_video(final_timestamps, local_path_to_video, local_output, video_metadata, color=(255,0,0), thickness=2):
+def apply_faces_to_video(final_timestamps, local_path_to_video, local_output, video_metadata, color=(255, 0, 0), thickness=2, motion_threshold=1000):
     # Extract video info
     frame_rate = video_metadata["FrameRate"]
     frame_height = video_metadata["FrameHeight"]
     frame_width = video_metadata["FrameWidth"]
     width_delta = int(frame_width / 250)
     height_delta = int(frame_height / 100)
+
     # Set up support for OpenCV
     frame_counter = 0
     fourcc = cv2.VideoWriter_fourcc('M', 'J', 'P', 'G')
+    
     # Create the file pointers
     v = cv2.VideoCapture(local_path_to_video)
     print("VideoCapture - local path to video")
@@ -55,64 +57,62 @@ def apply_faces_to_video(final_timestamps, local_path_to_video, local_output, vi
         fps=int(frame_rate),
         frameSize=(frame_width, frame_height)
     )
+    
+    # Initialize for motion detection
+    prev_frame = None
 
-    # Parameters
-    sliding_window_size = 3  # Number of frames to apply the blur
-
-    # Initialize frame counter
-    frame_counter = 0
-
+    # Open the video
     while v.isOpened():
         has_frame, frame = v.read()
-        if not has_frame:
+        if has_frame:
+            # Convert to grayscale for motion detection
+            gray_frame = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
+            gray_frame = cv2.GaussianBlur(gray_frame, (21, 21), 0)
+
+            if prev_frame is None:
+                prev_frame = gray_frame
+                out.write(frame)
+                frame_counter += 1
+                continue
+
+            # Calculate the absolute difference between frames
+            frame_delta = cv2.absdiff(prev_frame, gray_frame)
+            thresh = cv2.threshold(frame_delta, 25, 255, cv2.THRESH_BINARY)[1]
+            thresh = cv2.dilate(thresh, None, iterations=2)
+
+            # Check if motion is detected
+            if np.sum(thresh) > motion_threshold:
+                for t in final_timestamps:
+                    faces = final_timestamps.get(t)
+                    lower_bound = int(int(t) / 1000 * frame_rate)
+                    upper_bound = int(int(t) / 1000 * frame_rate + frame_rate / 2) + 1
+
+                    if (frame_counter >= lower_bound) and (frame_counter <= upper_bound):
+                        for f in faces:
+                            x = int(f['Left'] * frame_width) - width_delta
+                            y = int(f['Top'] * frame_height) - height_delta
+                            w = int(f['Width'] * frame_width) + 2 * width_delta
+                            h = int(f['Height'] * frame_height) + 2 * height_delta
+
+                            x1, y1 = x, y
+                            x2, y2 = x1 + w, y1 + h
+
+                            to_blur = frame[y1:y2, x1:x2]
+                            blurred = anonymize_face_pixelate(to_blur, blocks=10)
+                            frame[y1:y2, x1:x2] = blurred
+
+                            frame = cv2.rectangle(frame, (x, y), (x + w, y + h), color, thickness)
+
+            out.write(frame)
+            prev_frame = gray_frame
+            frame_counter += 1
+        else:
             break
 
-        blurred_this_frame = False
-        frame_queue = deque(maxlen=sliding_window_size)
-        frame_queue.append(frame.copy())  # Store a copy of the current frame
-
-        # Reset the current frame for blurring
-        current_frame_blurred = frame.copy()
-
-        for t in final_timestamps:
-            faces = final_timestamps.get(t, [])
-            lower_bound = int(int(t) / 1000 * original_frame_rate)
-            upper_bound = int(int(t) / 1000 * original_frame_rate + original_frame_rate / 2) + 1
-            
-            if lower_bound <= frame_counter <= upper_bound:
-                for f in faces:
-                    # Calculate bounding box
-                    x = int(f['Left'] * frame_width) - width_delta
-                    y = int(f['Top'] * frame_height) - height_delta
-                    w = int(f['Width'] * frame_width) + 2 * width_delta
-                    h = int(f['Height'] * frame_height) + 2 * height_delta
-                    
-                    x1, y1 = max(x, 0), max(y, 0)
-                    x2, y2 = min(x1 + w, frame_width), min(y1 + h, frame_height)
-
-                    # Blur the region of interest in the current frame
-                    to_blur = current_frame_blurred[y1:y2, x1:x2]
-                    blurred = anonymize_face_pixelate(to_blur, blocks=10)
-                    current_frame_blurred[y1:y2, x1:x2] = blurred
-
-                    # Draw rectangle around the face
-                    cv2.rectangle(current_frame_blurred, (x, y), (x + w, y + h), (255, 0, 0), 3)
-                    blurred_this_frame = True
-
-                    # Add the frame to the sliding window
-                    frame_queue.append(current_frame_blurred.copy())
-
-        # If blurring was done, write the blurred frame to the output
-        if blurred_this_frame:
-            out.write(current_frame_blurred)
-        else:
-            out.write(frame)  # Write the original frame if no blurring was done
-
-        frame_counter += 1
-
-    # Clean up
-    v.release()
     out.release()
+    v.release()
+    print(f"Complete. {frame_counter} frames were written.")
+
 
 
 def integrate_audio(original_video, output_video, audio_path='/tmp/audio.mp3'):
