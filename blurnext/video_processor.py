@@ -29,7 +29,7 @@ def anonymize_face_pixelate(image, blocks=30):
             # compute the mean of the ROI 
             (b, g, r) = [int(x) for x in cv2.mean(roi)[:3]]
             # draw a rectangle with the mean RGB values over the ROI in the original image
-            # cv2.rectangle(image, (first_x, first_y), (last_x, last_y), (b, g, r), -1)
+            cv2.rectangle(image, (first_x, first_y), (last_x, last_y), (b, g, r), -1)
 
     # return the pixelated blurred image
     return image
@@ -76,7 +76,7 @@ def apply_faces_to_video(final_timestamps, local_path_to_video, local_output, vi
                         blurred = anonymize_face_pixelate(to_blur, blocks=10)
                         frame[y1:y2, x1:x2] = blurred
 
-                        frame = cv2.rectangle(frame, (x,y), (x+w,y+h), (255,0,0), 3)
+                        # frame = cv2.rectangle(frame, (x,y), (x+w,y+h), (255,0,0), 3)
             out.write(frame)
             frame_counter += 1
         else:
