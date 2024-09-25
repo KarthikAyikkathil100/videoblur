@@ -88,7 +88,7 @@ functions:
     events:
       - http:
           path: '/admin/blur/v4'
-          method: 'get'
+          method: 'post'
           cors: true
 
 
