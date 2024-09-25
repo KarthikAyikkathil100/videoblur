@@ -69,8 +69,6 @@ def get_timestamps_and_faces(job_id):
 def lambda_function(event, context):
     # download file locally to /tmp retrieve metadata
     try:
-        body = event.body
-        print('body')
         body(body)
         platform = sys.platform
         print('platform')
