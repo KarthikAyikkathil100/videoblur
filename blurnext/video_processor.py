@@ -5,7 +5,7 @@ from moviepy.editor import VideoFileClip, AudioFileClip, CompositeAudioClip
 import os
 
 
-def anonymize_face_pixelate(image, blocks=10):
+def anonymize_face_pixelate(image, blocks=20):
     """
     Computes a pixelated blur with OpenCV
     Args:
