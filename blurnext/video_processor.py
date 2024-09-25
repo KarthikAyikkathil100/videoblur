@@ -36,7 +36,7 @@ def anonymize_face_pixelate(image, blocks=30):
     return image
 
 
-def apply_faces_to_video(final_timestamps, local_path_to_video, local_output, video_metadata, color=(255, 0, 0), thickness=2):
+def apply_faces_to_video_old(final_timestamps, local_path_to_video, local_output, video_metadata, color=(255, 0, 0), thickness=2):
     # Extract video info
     frame_rate = video_metadata["FrameRate"]
     frame_height = video_metadata["FrameHeight"]
@@ -92,6 +92,72 @@ def apply_faces_to_video(final_timestamps, local_path_to_video, local_output, vi
     v.release()
     print(f"Complete. {frame_counter} frames were written.")
 
+def apply_faces_to_video(final_timestamps, local_path_to_video, local_output, video_metadata, color=(255, 0, 0), thickness=2, buffer_size=5):
+    # Extract video info
+    frame_rate = video_metadata["FrameRate"]
+    frame_height = video_metadata["FrameHeight"]
+    frame_width = video_metadata["FrameWidth"]
+    width_delta = int(frame_width / 250)
+    height_delta = int(frame_height / 100)
+
+    # Set up support for OpenCV
+    frame_counter = 0
+    fourcc = cv2.VideoWriter_fourcc('M', 'J', 'P', 'G')
+    
+    # Create the file pointers
+    v = cv2.VideoCapture(local_path_to_video)
+    print("VideoCapture - local path to video")
+    out = cv2.VideoWriter(
+        filename=local_output,
+        fourcc=fourcc,
+        fps=int(frame_rate),
+        frameSize=(frame_width, frame_height)
+    )
+    
+    # Initialize a dictionary to keep track of faces across frames
+    face_buffer = {}
+
+    # Open the video
+    while v.isOpened():
+        has_frame, frame = v.read()
+        if has_frame:
+            current_faces = []
+            for t in final_timestamps:
+                faces = final_timestamps.get(t)
+                lower_bound = int(int(t) / 1000 * frame_rate)
+                upper_bound = int(int(t) / 1000 * frame_rate + frame_rate / 2) + 1
+
+                if (frame_counter >= lower_bound) and (frame_counter <= upper_bound):
+                    for f in faces:
+                        current_faces.append(f)  # Keep track of current faces
+                        x = int(f['Left'] * frame_width) - width_delta
+                        y = int(f['Top'] * frame_height) - height_delta
+                        w = int(f['Width'] * frame_width) + 2 * width_delta
+                        h = int(f['Height'] * frame_height) + 2 * height_delta
+
+                        x1, y1 = x, y
+                        x2, y2 = x1 + w, y1 + h
+
+                        # Update the face buffer for continuity
+                        face_buffer[frame_counter] = (x1, y1, x2, y2)
+
+            # Process the frame
+            for frame_idx in range(frame_counter - buffer_size, frame_counter + buffer_size + 1):
+                if frame_idx in face_buffer:
+                    x1, y1, x2, y2 = face_buffer[frame_idx]
+                    to_blur = frame[y1:y2, x1:x2]
+                    blurred = anonymize_face_pixelate(to_blur, blocks=10)
+                    frame[y1:y2, x1:x2] = blurred
+                    frame = cv2.rectangle(frame, (x1, y1), (x2, y2), color, thickness)
+
+            out.write(frame)
+            frame_counter += 1
+        else:
+            break
+
+    out.release()
+    v.release()
+    print(f"Complete. {frame_counter} frames were written.")
 
 
 
