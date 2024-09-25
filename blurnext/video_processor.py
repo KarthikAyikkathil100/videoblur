@@ -36,7 +36,7 @@ def anonymize_face_pixelate(image, blocks=30):
     return image
 
 
-def apply_faces_to_video(final_timestamps, local_path_to_video, local_output, video_metadata, color=(255, 0, 0), thickness=2, motion_threshold=1000):
+def apply_faces_to_video(final_timestamps, local_path_to_video, local_output, video_metadata, color=(255, 0, 0), thickness=2):
     # Extract video info
     frame_rate = video_metadata["FrameRate"]
     frame_height = video_metadata["FrameHeight"]
@@ -58,53 +58,32 @@ def apply_faces_to_video(final_timestamps, local_path_to_video, local_output, vi
         frameSize=(frame_width, frame_height)
     )
     
-    # Initialize for motion detection
-    prev_frame = None
-
     # Open the video
     while v.isOpened():
         has_frame, frame = v.read()
         if has_frame:
-            # Convert to grayscale for motion detection
-            gray_frame = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
-            gray_frame = cv2.GaussianBlur(gray_frame, (21, 21), 0)
+            for t in final_timestamps:
+                faces = final_timestamps.get(t)
+                lower_bound = int(int(t) / 1000 * frame_rate)
+                upper_bound = int(int(t) / 1000 * frame_rate + frame_rate / 2) + 1
 
-            if prev_frame is None:
-                prev_frame = gray_frame
-                out.write(frame)
-                frame_counter += 1
-                continue
+                if (frame_counter >= lower_bound) and (frame_counter <= upper_bound):
+                    for f in faces:
+                        x = int(f['Left'] * frame_width) - width_delta
+                        y = int(f['Top'] * frame_height) - height_delta
+                        w = int(f['Width'] * frame_width) + 2 * width_delta
+                        h = int(f['Height'] * frame_height) + 2 * height_delta
 
-            # Calculate the absolute difference between frames
-            frame_delta = cv2.absdiff(prev_frame, gray_frame)
-            thresh = cv2.threshold(frame_delta, 25, 255, cv2.THRESH_BINARY)[1]
-            thresh = cv2.dilate(thresh, None, iterations=2)
+                        x1, y1 = x, y
+                        x2, y2 = x1 + w, y1 + h
 
-            # Check if motion is detected
-            if np.sum(thresh) > motion_threshold:
-                for t in final_timestamps:
-                    faces = final_timestamps.get(t)
-                    lower_bound = int(int(t) / 1000 * frame_rate)
-                    upper_bound = int(int(t) / 1000 * frame_rate + frame_rate / 4) + 1
+                        to_blur = frame[y1:y2, x1:x2]
+                        blurred = anonymize_face_pixelate(to_blur, blocks=10)
+                        frame[y1:y2, x1:x2] = blurred
 
-                    if (frame_counter >= lower_bound) and (frame_counter <= upper_bound):
-                        for f in faces:
-                            x = int(f['Left'] * frame_width) - width_delta
-                            y = int(f['Top'] * frame_height) - height_delta
-                            w = int(f['Width'] * frame_width) + 2 * width_delta
-                            h = int(f['Height'] * frame_height) + 2 * height_delta
-
-                            x1, y1 = x, y
-                            x2, y2 = x1 + w, y1 + h
-
-                            to_blur = frame[y1:y2, x1:x2]
-                            blurred = anonymize_face_pixelate(to_blur, blocks=30)
-                            frame[y1:y2, x1:x2] = blurred
-
-                            # frame = cv2.rectangle(frame, (x, y), (x + w, y + h), color, thickness)
+                        # frame = cv2.rectangle(frame, (x, y), (x + w, y + h), color, thickness)
 
             out.write(frame)
-            prev_frame = gray_frame
             frame_counter += 1
         else:
             break
@@ -112,6 +91,7 @@ def apply_faces_to_video(final_timestamps, local_path_to_video, local_output, vi
     out.release()
     v.release()
     print(f"Complete. {frame_counter} frames were written.")
+
 
 
 
