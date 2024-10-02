@@ -72,7 +72,7 @@ def lambda_function(event, context):
         print('body')
         print(event)
         print('key 1 logging')
-        print(getattr(event, 'key1'))
+        print(event.get('key1'))
         platform = sys.platform
         print('platform')
         print(platform)
