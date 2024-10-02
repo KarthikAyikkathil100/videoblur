@@ -71,6 +71,8 @@ def lambda_function(event, context):
     try:
         print('body')
         print(event)
+        print('key 1 logging')
+        print(event.key1)
         platform = sys.platform
         print('platform')
         print(platform)
