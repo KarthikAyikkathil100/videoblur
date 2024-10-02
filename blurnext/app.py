@@ -92,6 +92,7 @@ def lambda_function(event, context):
         local_filename = '/tmp/{}'.format(filename)
         local_filename_output = '/tmp/anonymized-{}'.format(filename)
         local_codec_output = '/tmp/codec-{}'.format(filename)
+        upper_bound_calc = int(event.get('eb_calc'))
     except KeyError:
         error_message = 'Lambda invoked without S3 event data. Event needs to reference a S3 bucket and object key.'
         logger.log(logging.ERROR, error_message)
@@ -120,7 +121,7 @@ def lambda_function(event, context):
             apply_faces_to_video_test(timestamps, local_filename, local_filename_output, response["VideoMetadata"])
         else:
             print('Default blur fn called')
-            apply_faces_to_video(timestamps, local_filename, local_filename_output, response["VideoMetadata"])
+            apply_faces_to_video(timestamps, local_filename, local_filename_output, response["VideoMetadata"], upper_bound_calc)
         
         print('face blur done !!')
     except Exception as e:

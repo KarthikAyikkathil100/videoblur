@@ -36,7 +36,9 @@ def anonymize_face_pixelate(image, blocks=30):
     return image
 
 
-def apply_faces_to_video(final_timestamps, local_path_to_video, local_output, video_metadata, color=(255, 0, 0), thickness=2):
+def apply_faces_to_video(final_timestamps, local_path_to_video, local_output, video_metadata, color=(255, 0, 0), thickness=2, upper_bound_calc):
+    print('Using below for upper bound calculation')
+    print(upper_bound_calc)
     # Extract video info
     frame_rate = video_metadata["FrameRate"]
     frame_height = video_metadata["FrameHeight"]
@@ -65,8 +67,8 @@ def apply_faces_to_video(final_timestamps, local_path_to_video, local_output, vi
             for t in final_timestamps:
                 faces = final_timestamps.get(t)
                 lower_bound = int(int(t) / 1000 * frame_rate)
-                # upper_bound = int(int(t) / 1000 * frame_rate + frame_rate / 2) + 1
-                upper_bound = int(int(t) / 1000 * frame_rate + frame_rate) + 1
+                upper_bound = int(int(t) / 1000 * frame_rate + frame_rate / upper_bound_calc) + 1
+                # upper_bound = int(int(t) / 1000 * frame_rate + frame_rate) + 1
 
                 if (frame_counter >= lower_bound) and (frame_counter <= upper_bound):
                     for f in faces:
