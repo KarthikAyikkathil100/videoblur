@@ -77,7 +77,10 @@ def lambda_function(event, context):
         ffmpeg_path = shutil.which("ffmpeg")
         print('which ffmpeg')
         print(ffmpeg_path)
-        timestamps, response = get_timestamps_and_faces(event.get('job_id'))
+        job_id = event.get('job_id')
+        print('job_id')
+        print(job_id)
+        timestamps, response = get_timestamps_and_faces(job_id)
         print('Final response => ')
         print(response)
         print('final timestamps')
@@ -111,7 +114,8 @@ def lambda_function(event, context):
         # get timestamps
     try:
         print('face blur start')
-        if(event.get('fn_use') == 'test'):
+        choice = event.get('fn_use')
+        if(choice == 'test'):
             print('test blur fn called')
             apply_faces_to_video_test(timestamps, local_filename, local_filename_output, response["VideoMetadata"])
         else:
