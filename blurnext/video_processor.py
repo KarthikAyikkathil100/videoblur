@@ -126,7 +126,7 @@ def apply_faces_to_video_test(final_timestamps, local_path_to_video, local_outpu
                 # upper_bound = int(int(t) / 1000 * frame_rate + frame_rate / 2) + 1
                 upper_bound = int(int(t) / 1000 * frame_rate + frame_rate) + 1
 
-                if (true):
+                if (True):
                     for f in faces:
                         x = int(f['Left'] * frame_width) - width_delta
                         y = int(f['Top'] * frame_height) - height_delta
