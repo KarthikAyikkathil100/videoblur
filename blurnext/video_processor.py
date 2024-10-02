@@ -140,7 +140,7 @@ def apply_faces_to_video_test(final_timestamps, local_path_to_video, local_outpu
                         blurred = anonymize_face_pixelate(to_blur, blocks=10)
                         frame[y1:y2, x1:x2] = blurred
 
-                        # frame = cv2.rectangle(frame, (x, y), (x + w, y + h), color, thickness)
+                        frame = cv2.rectangle(frame, (x, y), (x + w, y + h), color, thickness)
 
             out.write(frame)
             frame_counter += 1
