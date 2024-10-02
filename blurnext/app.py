@@ -15,7 +15,7 @@ import shutil
 
 
 
-from video_processor import apply_faces_to_video, integrate_audio
+from video_processor import apply_faces_to_video, apply_faces_to_video_test, integrate_audio
 
 # Add conda environment's bin directory to PATH
 os.environ["PATH"] += os.pathsep + "/opt/conda-env/bin"
@@ -71,24 +71,20 @@ def lambda_function(event, context):
     try:
         print('body')
         print(event)
-        print('key 1 logging')
-        print(event.get('key1'))
-        platform = sys.platform
-        print('platform')
-        print(platform)
+        
         print('ffmpeg')
         print(ffmpeg)
         ffmpeg_path = shutil.which("ffmpeg")
         print('which ffmpeg')
         print(ffmpeg_path)
-        timestamps, response = get_timestamps_and_faces('5fa32883dd8e984073ef8ea7e4f340a18a9113de93aa30db59c755aa65196127')
+        timestamps, response = get_timestamps_and_faces(event.get('job_id'))
         print('Final response => ')
         print(response)
         print('final timestamps')
         print(timestamps)
         # get metadata of file uploaded to Amazon S3
         bucket = 'project-videostore'
-        key = 'walking_speed.mp4'
+        key = event.get('file_name')
         filename = key
         local_filename = '/tmp/{}'.format(filename)
         local_filename_output = '/tmp/anonymized-{}'.format(filename)
@@ -115,7 +111,13 @@ def lambda_function(event, context):
         # get timestamps
     try:
         print('face blur start')
-        apply_faces_to_video(timestamps, local_filename, local_filename_output, response["VideoMetadata"])
+        if(event.get('fn_use') == 'test'):
+            print('test blur fn called')
+            apply_faces_to_video_test(timestamps, local_filename, local_filename_output, response["VideoMetadata"])
+        else:
+            print('Default blur fn called')
+            apply_faces_to_video(timestamps, local_filename, local_filename_output, response["VideoMetadata"])
+        
         print('face blur done !!')
     except Exception as e:
         print(e)
