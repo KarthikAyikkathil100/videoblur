@@ -36,7 +36,7 @@ def anonymize_face_pixelate(image, blocks=30):
     return image
 
 
-def apply_faces_to_video(final_timestamps, local_path_to_video, local_output, video_metadata, color=(255, 0, 0), thickness=2, upper_bound_calc):
+def apply_faces_to_video(final_timestamps, local_path_to_video, local_output, video_metadata, upper_bound_calc, color=(255, 0, 0), thickness=2):
     print('Using below for upper bound calculation')
     print(upper_bound_calc)
     # Extract video info
