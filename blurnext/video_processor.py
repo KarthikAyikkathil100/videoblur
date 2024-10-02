@@ -70,6 +70,12 @@ def apply_faces_to_video(final_timestamps, local_path_to_video, local_output, vi
                 upper_bound = int(int(t) / 1000 * frame_rate + frame_rate / upper_bound_calc) + 1
                 # upper_bound = int(int(t) / 1000 * frame_rate + frame_rate) + 1
 
+                print('lower_bound -')
+                print(lower_bound)
+                print('upper_bound -')
+                print(upper_bound)
+                print('-----------------------')
+
                 if (frame_counter >= lower_bound) and (frame_counter <= upper_bound):
                     for f in faces:
                         x = int(f['Left'] * frame_width) - width_delta
