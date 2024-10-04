@@ -15,7 +15,7 @@ import shutil
 
 
 
-from video_processor import apply_faces_to_video, apply_faces_to_video_test, integrate_audio
+from video_processor import apply_faces_to_video, apply_faces_to_video_test, integrate_audio, apply_faces_to_video_v3
 
 # Add conda environment's bin directory to PATH
 os.environ["PATH"] += os.pathsep + "/opt/conda-env/bin"
@@ -119,6 +119,9 @@ def lambda_function(event, context):
         if(choice == 'test'):
             print('test blur fn called')
             apply_faces_to_video_test(timestamps, local_filename, local_filename_output, response["VideoMetadata"])
+        elif (choice == 'v3'):
+            print('V3 blur fn called')
+            apply_faces_to_video_v3(timestamps, local_filename, local_filename_output, response["VideoMetadata"], upper_bound_calc)
         else:
             print('Default blur fn called')
             apply_faces_to_video(timestamps, local_filename, local_filename_output, response["VideoMetadata"], upper_bound_calc)
