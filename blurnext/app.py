@@ -15,7 +15,7 @@ import shutil
 
 
 
-from video_processor import apply_faces_to_video, apply_faces_to_video_test, integrate_audio, apply_faces_to_video_v3
+from video_processor import apply_faces_to_video, apply_faces_to_video_test, integrate_audio, apply_faces_to_video_v3, apply_faces_to_video_v4
 
 # Add conda environment's bin directory to PATH
 os.environ["PATH"] += os.pathsep + "/opt/conda-env/bin"
@@ -93,6 +93,7 @@ def lambda_function(event, context):
         local_filename_output = '/tmp/anonymized-{}'.format(filename)
         local_codec_output = '/tmp/codec-{}'.format(filename)
         upper_bound_calc = int(event.get('eb_calc'))
+        next_blurs_count = int(event.get('next_blurs'))
     except KeyError:
         error_message = 'Lambda invoked without S3 event data. Event needs to reference a S3 bucket and object key.'
         logger.log(logging.ERROR, error_message)
@@ -122,6 +123,9 @@ def lambda_function(event, context):
         elif (choice == 'v3'):
             print('V3 blur fn called')
             apply_faces_to_video_v3(timestamps, local_filename, local_filename_output, response["VideoMetadata"], upper_bound_calc)
+        elif (choice == 'v4'):
+            print('V4 blur fn called')
+            apply_faces_to_video_v4(timestamps, local_filename, local_filename_output, response["VideoMetadata"], upper_bound_calc, next_blurs_count)
         else:
             print('Default blur fn called')
             apply_faces_to_video(timestamps, local_filename, local_filename_output, response["VideoMetadata"], upper_bound_calc)
