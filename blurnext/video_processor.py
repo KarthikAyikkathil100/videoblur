@@ -274,7 +274,7 @@ def apply_faces_to_video_v4(final_timestamps, local_path_to_video, local_output,
     print(f"Complete. {frame_counter} frames were written.")
 
 
-def blur_next_frames(blur_next_n_frames, og_frame, video, og_frame_count, final_timestamps, local_path_to_video, local_output, video_metadata, upper_bound_calc, color=(255, 0, 0), thickness=2):
+def blur_next_frames(blur_next_n_frames, og_frame, v, og_frame_count, final_timestamps, local_path_to_video, local_output, video_metadata, upper_bound_calc, color=(255, 0, 0), thickness=2):
     for i in range(1, blur_next_n_frames+1):
         current_frame = og_frame_count+1
         has_next_frame, next_frame = v.read()
