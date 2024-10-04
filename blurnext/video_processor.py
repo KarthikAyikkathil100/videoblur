@@ -260,10 +260,10 @@ def apply_faces_to_video_v4(final_timestamps, local_path_to_video, local_output,
                         # frame = cv2.rectangle(frame, (x, y), (x + w, y + h), color, thickness)
 
                 # out.write(frame)
-                print('block 1')
-                frame_counter += 1
-                print('Calling the nextBlur fn')
-                blur_next_frames(next_blurs, frame, v, (frame_counter-1), final_timestamps, local_path_to_video, local_output, video_metadata, upper_bound_calc, frame_rate, width_delta, height_delta, frame_height, frame_width, color=(255, 0, 0), thickness=2)
+            print('block 1')
+            frame_counter += 1
+            print('Calling the nextBlur fn')
+            blur_next_frames(next_blurs, frame, v, (frame_counter-1), final_timestamps, local_path_to_video, local_output, video_metadata, upper_bound_calc, frame_rate, width_delta, height_delta, frame_height, frame_width, color=(255, 0, 0), thickness=2)
             v.set(cv2.CAP_PROP_POS_FRAMES, (frame_counter-1))
             out.write(frame)
         else:
