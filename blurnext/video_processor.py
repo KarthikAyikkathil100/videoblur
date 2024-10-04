@@ -264,8 +264,8 @@ def apply_faces_to_video_v4(final_timestamps, local_path_to_video, local_output,
                 frame_counter += 1
                 print('Calling the nextBlur fn')
                 blur_next_frames(next_blurs, frame, v, (frame_counter-1), final_timestamps, local_path_to_video, local_output, video_metadata, upper_bound_calc, frame_rate, width_delta, height_delta, frame_height, frame_width, color=(255, 0, 0), thickness=2)
-                v.set(cv2.CAP_PROP_POS_FRAMES, (frame_counter-1))
-                out.write(frame)
+            v.set(cv2.CAP_PROP_POS_FRAMES, (frame_counter-1))
+            out.write(frame)
         else:
             break
 
@@ -312,6 +312,83 @@ def blur_next_frames(blur_next_n_frames, og_frame, v, og_frame_count, final_time
         # else:
         #     out.write(frame)
         
+def apply_faces_to_video_v5(final_timestamps, local_path_to_video, local_output, video_metadata, upper_bound_calc, next_blurs, color=(255, 0, 0), thickness=2):
+    print('Using below for upper bound calculation')
+    print(upper_bound_calc)
+
+    frame_rate = video_metadata["FrameRate"]
+    frame_height = video_metadata["FrameHeight"]
+    frame_width = video_metadata["FrameWidth"]
+    width_delta = int(frame_width / 250)
+    height_delta = int(frame_height / 100)
+
+    fourcc = cv2.VideoWriter_fourcc('M', 'J', 'P', 'G')
+    v = cv2.VideoCapture(local_path_to_video)
+    out = cv2.VideoWriter(local_output, fourcc, frame_rate, (frame_width, frame_height))
+
+    frame_counter = 0
+
+    while v.isOpened():
+        has_frame, frame = v.read()
+        if not has_frame:
+            break
+        
+        # Process frame
+        for t in final_timestamps:
+            faces = final_timestamps.get(t)
+            lower_bound = int(int(t) / 1000 * frame_rate)
+            upper_bound = lower_bound + int(frame_rate / upper_bound_calc) + 1
+
+            if lower_bound <= frame_counter <= upper_bound:
+                for f in faces:
+                    x = int(f['Left'] * frame_width) - width_delta
+                    y = int(f['Top'] * frame_height) - height_delta
+                    w = int(f['Width'] * frame_width) + 2 * width_delta
+                    h = int(f['Height'] * frame_height) + 2 * height_delta
+
+                    x1, y1 = x, y
+                    x2, y2 = x1 + w, y1 + h
+
+                    to_blur = frame[y1:y2, x1:x2]
+                    blurred = anonymize_face_pixelate(to_blur, blocks=10)
+                    frame[y1:y2, x1:x2] = blurred
+
+        # Write the current frame to output
+        # out.write(frame)
+        current_frame_count = frame_counter
+        frame_counter += 1
+
+        # Handle next blur frames
+        for i in range(1, next_blurs + 1):
+            has_next_frame, next_frame = v.read()
+            if not has_next_frame:
+                break
+
+            # Apply blur to next frames
+            for t in final_timestamps:
+                faces = final_timestamps.get(t)
+                lower_bound = int(int(t) / 1000 * frame_rate)
+                upper_bound = lower_bound + int(frame_rate / upper_bound_calc) + 1
+
+                if lower_bound <= frame_counter + i <= upper_bound:
+                    for f in faces:
+                        x = int(f['Left'] * frame_width) - width_delta
+                        y = int(f['Top'] * frame_height) - height_delta
+                        w = int(f['Width'] * frame_width) + 2 * width_delta
+                        h = int(f['Height'] * frame_height) + 2 * height_delta
+
+                        x1, y1 = x, y
+                        x2, y2 = x1 + w, y1 + h
+
+                        to_blur = next_frame[y1:y2, x1:x2]
+                        blurred = anonymize_face_pixelate(to_blur, blocks=10)
+                        next_frame[y1:y2, x1:x2] = blurred
+
+            out.write(next_frame)
+
+    out.release()
+    v.release()
+    print(f"Complete. {frame_counter} frames were written.")
 
 def apply_faces_to_video_test(final_timestamps, local_path_to_video, local_output, video_metadata, color=(255, 0, 0), thickness=2):
     # Extract video info
