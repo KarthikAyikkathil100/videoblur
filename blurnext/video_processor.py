@@ -292,7 +292,7 @@ def blur_next_frames(blur_next_n_frames, og_frame, v, og_frame_count, final_time
                 print(upper_bound)
                 print('-----------------------')
 
-                if (og_frame_count >= lower_bound) and (og_frame_count <= upper_bound):
+                if (current_frame >= lower_bound) and (current_frame <= upper_bound):
                     for f in faces:
                         x = int(f['Left'] * frame_width) - width_delta
                         y = int(f['Top'] * frame_height) - height_delta
@@ -305,7 +305,7 @@ def blur_next_frames(blur_next_n_frames, og_frame, v, og_frame_count, final_time
                         to_blur = og_frame[y1:y2, x1:x2]
                         blurred = anonymize_face_pixelate(to_blur, blocks=10)
                         og_frame[y1:y2, x1:x2] = blurred #Overwrite on the orignal frame        
-                        
+            current_frame += 1            
             # Get back to the orignal frame
             # v.set(cv2.CAP_PROP_POS_FRAMES, current_frame)
             # out.write(frame)
