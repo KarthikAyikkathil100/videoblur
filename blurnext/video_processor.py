@@ -275,8 +275,8 @@ def apply_faces_to_video_v4(final_timestamps, local_path_to_video, local_output,
 
 
 def blur_next_frames(blur_next_n_frames, og_frame, v, og_frame_count, final_timestamps, local_path_to_video, local_output, video_metadata, upper_bound_calc, frame_rate, width_delta, height_delta, frame_height, frame_width, color=(255, 0, 0), thickness=2):
+    current_frame = og_frame_count+1
     for i in range(1, blur_next_n_frames+1):
-        current_frame = og_frame_count+1
         has_next_frame, next_frame = v.read()
         if has_next_frame:
             # Process the next frame
@@ -309,8 +309,8 @@ def blur_next_frames(blur_next_n_frames, og_frame, v, og_frame_count, final_time
             # Get back to the orignal frame
             # v.set(cv2.CAP_PROP_POS_FRAMES, current_frame)
             # out.write(frame)
-        # else:
-        #     out.write(frame)
+        else:
+            break
         
 def apply_faces_to_video_v5(final_timestamps, local_path_to_video, local_output, video_metadata, upper_bound_calc, next_blurs, color=(255, 0, 0), thickness=2):
     print('Using below for upper bound calculation')
