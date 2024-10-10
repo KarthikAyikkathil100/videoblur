@@ -92,7 +92,7 @@ def lambda_function(event, context):
         local_filename = '/tmp/{}'.format(filename)
         local_filename_output = '/tmp/anonymized-{}'.format(filename)
         local_codec_output = '/tmp/codec-{}'.format(filename)
-        upper_bound_calc = int(event.get('eb_calc'))
+        upper_bound_calc = float(event.get('eb_calc'))
         next_blurs_count = int(event.get('next_blurs'))
     except KeyError:
         error_message = 'Lambda invoked without S3 event data. Event needs to reference a S3 bucket and object key.'
