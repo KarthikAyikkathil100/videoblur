@@ -57,6 +57,8 @@ def get_timestamps_and_faces(job_id):
             if time_faces == None:
                 final_timestamps[t] = []
             final_timestamps[t].append(f)
+        print("pre-final timestamp")
+        print(final_timestamps)
         # Check if there is another portion of the response
         try:
             next_token = response['NextToken']

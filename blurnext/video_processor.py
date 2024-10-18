@@ -311,7 +311,88 @@ def blur_next_frames(blur_next_n_frames, og_frame, v, og_frame_count, final_time
             # out.write(frame)
         else:
             break
-        
+
+
+def apply_faces_to_video_v6(final_timestamps, local_path_to_video, local_output, video_metadata, upper_bound_calc, next_blurs, color=(255, 0, 0), thickness=2):
+    print('Using below for upper bound calculation')
+    print(upper_bound_calc)
+    # Extract video info
+    frame_rate = video_metadata["FrameRate"]
+    frame_height = video_metadata["FrameHeight"]
+    frame_width = video_metadata["FrameWidth"]
+    width_delta = int(frame_width / 250)
+    height_delta = int(frame_height / 100)
+
+    # Set up support for OpenCV
+    frame_counter = 0
+    fourcc = cv2.VideoWriter_fourcc('M', 'J', 'P', 'G')
+    
+    # Create the file pointers
+    v = cv2.VideoCapture(local_path_to_video)
+    print("VideoCapture - local path to video")
+    out = cv2.VideoWriter(
+        filename=local_output,
+        fourcc=fourcc,
+        fps=int(frame_rate),
+        frameSize=(frame_width, frame_height)
+    )
+    
+    # Open the video
+    while v.isOpened():
+        has_frame, frame = v.read()
+        if has_frame:
+            for t in final_timestamps:
+                faces = final_timestamps.get(t)
+                lower_bound = int(int(t) / 1000 * frame_rate)
+                upper_bound = int(int(t) / 1000 * frame_rate + frame_rate / upper_bound_calc) + 1
+                # upper_bound = int(int(t) / 1000 * frame_rate + frame_rate) + 1
+
+                print('lower_bound -')
+                print(lower_bound)
+                print('upper_bound -')
+                print(upper_bound)
+                print('-----------------------')
+
+                if (frame_counter >= lower_bound) and (frame_counter <= upper_bound):
+                    for f in faces:
+                        # Get the bounding box values from Google's Video Intelligence API
+                        left = f['left']
+                        top = f['top']
+                        right = f['right']
+                        bottom = f['bottom']
+
+                        # Calculate the pixel coordinates based on frame dimensions
+                        x = int(left * frame_width) - width_delta
+                        y = int(top * frame_height) - height_delta
+                        w = int((right - left) * frame_width) + 2 * width_delta
+                        h = int((bottom - top) * frame_height) + 2 * height_delta
+
+                        x1, y1 = x, y
+                        x2, y2 = x1 + w, y1 + h
+
+                        to_blur = frame[y1:y2, x1:x2]
+                        blurred = anonymize_face_pixelate(to_blur, blocks=10)
+                        frame[y1:y2, x1:x2] = blurred
+
+
+                        # frame = cv2.rectangle(frame, (x, y), (x + w, y + h), color, thickness)
+
+                # out.write(frame)
+            print('block 1')
+            frame_counter += 1
+            print('Calling the nextBlur fn')
+            blur_next_frames(next_blurs, frame, v, (frame_counter-1), final_timestamps, local_path_to_video, local_output, video_metadata, upper_bound_calc, frame_rate, width_delta, height_delta, frame_height, frame_width, color=(255, 0, 0), thickness=2)
+            v.set(cv2.CAP_PROP_POS_FRAMES, (frame_counter-1))
+            out.write(frame)
+        else:
+            break
+
+    out.release()
+    v.release()
+    print(f"Complete. {frame_counter} frames were written.")
+
+
+
 def apply_faces_to_video_v5(final_timestamps, local_path_to_video, local_output, video_metadata, upper_bound_calc, next_blurs, color=(255, 0, 0), thickness=2):
     print('Using below for upper bound calculation')
     print(upper_bound_calc)
