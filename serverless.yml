@@ -20,19 +20,19 @@ custom:
   REGION: !Ref AWS::Region
   STAGE: ${self:provider.stage}
   APPLICATION: 'videoblur'
-  VPC:
-    SGID: ${ssm:/routeme/${self:provider.stage}/rds-vpc/sgid}
-    SBNID_A: ${ssm:/routeme/${self:provider.stage}/rds-vpc/sbnid_a}
-    SBNID_B: ${ssm:/routeme/${self:provider.stage}/rds-vpc/sbnid_b}
-    SBNID_C: ${ssm:/routeme/${self:provider.stage}/rds-vpc/sbnid_c}
-  LOCATION_ANALYTICS:
-    SUBMIT_TOPIC: ${ssm:/routeme/${self:provider.stage}/admin/analyticsSubmitArn}
-  RDS_DB:
-    DB_HOST: ${ssm:/routeme/${self:provider.stage}/rds-db/host}
-    DB_PORT: 5432 # Default PostgreSQL port
-    DB_NAME: ${ssm:/routeme/${self:provider.stage}/rds-db/name}
-    DB_SECRET_NAME: ${ssm:/routeme/${self:provider.stage}/rds-db/secret_name}
-    DB_SECRET_ARN: ${ssm:/routeme/${self:provider.stage}/rds-db/secret-arn}
+  # VPC:
+  #   SGID: ${ssm:/routeme/${self:provider.stage}/rds-vpc/sgid}
+  #   SBNID_A: ${ssm:/routeme/${self:provider.stage}/rds-vpc/sbnid_a}
+  #   SBNID_B: ${ssm:/routeme/${self:provider.stage}/rds-vpc/sbnid_b}
+  #   SBNID_C: ${ssm:/routeme/${self:provider.stage}/rds-vpc/sbnid_c}
+  # LOCATION_ANALYTICS:
+  #   SUBMIT_TOPIC: ${ssm:/routeme/${self:provider.stage}/admin/analyticsSubmitArn}
+  # RDS_DB:
+  #   DB_HOST: ${ssm:/routeme/${self:provider.stage}/rds-db/host}
+  #   DB_PORT: 5432 # Default PostgreSQL port
+  #   DB_NAME: ${ssm:/routeme/${self:provider.stage}/rds-db/name}
+  #   DB_SECRET_NAME: ${ssm:/routeme/${self:provider.stage}/rds-db/secret_name}
+  #   DB_SECRET_ARN: ${ssm:/routeme/${self:provider.stage}/rds-db/secret-arn}
 
 functions:
   FacedetectionStartFunction:
@@ -103,19 +103,19 @@ functions:
           path: '/admin/blur/v4'
           method: 'post'
           cors: true
-  VpcTestFunction:
-    name: ${self:custom.STAGE}-Admin-VpcTestFunction
-    runtime: nodejs18.x
-    handler: './controllers/blur_face.handler'
-    role: 'arn:aws:iam::021891572638:role/masterrole'
-    package:
-      patterns:
-        - 'controllers/vpc_test.js'
-        - 'package.json'
-    events:
-      - http:
-          path: '/admin/vpc-test'
-          method: 'get'
-          cors: true
+  # VpcTestFunction:
+  #   name: ${self:custom.STAGE}-Admin-VpcTestFunction
+  #   runtime: nodejs18.x
+  #   handler: './controllers/blur_face.handler'
+  #   role: 'arn:aws:iam::021891572638:role/masterrole'
+  #   package:
+  #     patterns:
+  #       - 'controllers/vpc_test.js'
+  #       - 'package.json'
+  #   events:
+  #     - http:
+  #         path: '/admin/vpc-test'
+  #         method: 'get'
+  #         cors: true
 
 
